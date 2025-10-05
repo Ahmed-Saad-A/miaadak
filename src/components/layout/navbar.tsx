@@ -1,15 +1,16 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import { useRouter, usePathname } from "next/navigation";
-import logo from "../../assets/Logo.png";
-import { Button } from "@/components";
 
-const Navbar = () => {
-    const router = useRouter();
+export function Navbar() {
     const pathname = usePathname();
+    const router = useRouter();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const navItems = [
         { href: "/contact", label: "تواصل معنا" },
@@ -18,151 +19,177 @@ const Navbar = () => {
         { href: "/", label: "الرئيسية" },
     ];
 
-    const navigate = (href: string) => {
-        setIsMobileMenuOpen(false);
-        router.replace(href);
-    };
+    // useEffect(() => {
+    //     // Basic auth check via localStorage token set on login
+    //     try {
+    //         const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+    //         setIsAuthenticated(Boolean(token));
+    //     } catch {}
+    // }, [pathname]);
 
-    useEffect(() => {
-        const nav = document.getElementById("navbar");
-        const handleScroll = () => {
-            if (window.scrollY > 50) {
-                nav?.classList.add("bg-white/90", "shadow-xl");
-                nav?.classList.remove("bg-white/30");
-            } else {
-                nav?.classList.add("bg-white/30");
-                nav?.classList.remove("bg-white/90", "shadow-xl");
-            }
-        };
-
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
-
+    function handleLogout() {
+        try {
+            localStorage.removeItem("auth_token");
+        } catch {}
+        setIsAuthenticated(false);
+        router.push("/");
+    }
 
     return (
-        <nav
-            id="navbar"
-            className="fixed top-4 left-1/2 -translate-x-1/2 w-full  mx-auto px-6 py-3 rounded-2xl backdrop-blur-md bg-white/30 shadow-lg z-50 transition-colors duration-300"
-        >
-            <div className="max-w-7xl mx-auto grid grid-cols-3 items-center gap-4">
-                {/* Left: Buttons */}
-                <div className="flex items-center gap-3 justify-start">
-                    <Button
-                        
-                        className="px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white transition font-medium"
-                    >
-                        تسجيل الدخول
-                    </Button>
-                    <Button
-                        
-                        className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium"
-                    >
-                        إنشاء حساب
-                    </Button>
+        <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
+            <div className="container mx-auto px-4">
+                <div className="flex flex-row-reverse h-16 items-center justify-between">
+                    {/* Logo */}
+                    <Link href="/" className="flex items-center space-x-2">
+                        <div className="h-8 w-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                            <span className="text-white font-bold text-lg">
+                                م
+                            </span>
+                        </div>
+                        <span className="font-bold text-xl text-orange-500">ميعادك</span>
+                    </Link>
 
-                    {/* Mobile Menu Button */}
-                    <Button
-                        onClick={() => setIsMobileMenuOpen((s) => !s)}
-                        className="md:hidden p-2 rounded-md hover:bg-gray-100 ml-2"
-                        aria-label="قائمة"
-                    >
-                        {isMobileMenuOpen ? (
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-6 w-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        ) : (
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-6 w-6"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        )}
-                    </Button>
-                </div>
-
-                {/* Center: Tabs */}
-                <ul className="hidden md:flex justify-center gap-8 text-gray-700 font-medium">
-                    {navItems.map((item) => {
-                        const active = pathname === item.href;
-                        return (
-                            <li
-                                key={item.href}
-                                onClick={() => navigate(item.href)}
-                                className={`cursor-pointer transition px-2 py-1 ${active
-                                    ? "text-orange-500 font-semibold border-b-2 border-orange-500"
-                                    : "hover:text-orange-500"
+                    {/* Desktop Navigation */}
+                    <nav className="hidden lg:flex items-center space-x-8">
+                        {navItems.map((navItem) => {
+                            const isActive = pathname === navItem.href;
+                            return (
+                                <Link
+                                    key={navItem.href}
+                                    href={navItem.href}
+                                    className={`px-4 py-2 text-sm font-medium transition-all duration-200 rounded-md ${
+                                        isActive
+                                            ? "bg-orange-500 text-white shadow-md font-semibold"
+                                            : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
                                     }`}
-                            >
-                                {item.label}
-                            </li>
-                        );
-                    })}
-                </ul>
+                                >
+                                    {navItem.label}
+                                </Link>
+                            );
+                        })}
+                    </nav>
 
-                {/* Right: Logo */}
-                <div className="flex justify-end items-center">
-                    <div className="flex items-center gap-2">
-                        {/* <Image src={logo} alt="Logo" width={56} className="object-contain" /> */}
-                        <span className="hidden md:inline text-xl font-bold text-orange-500">ميعادك</span>
+                    {/* Action Buttons */}
+                    <div className="flex items-center space-x-2">
+                        {/* Desktop Auth Buttons */}
+                        <div className="hidden lg:flex items-center space-x-2">
+                            {isAuthenticated ? (
+                                <>
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={handleLogout}
+                                        className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
+                                    >
+                                        تسجيل الخروج
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    {pathname.startsWith("/auth/login") ? (
+                                        <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
+                                            <Link href="/auth/register">إنشاء حساب</Link>
+                                        </Button>
+                                    ) : pathname.startsWith("/auth/register") ? (
+                                        <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
+                                            <Link href="/auth/login">تسجيل الدخول</Link>
+                                        </Button>
+                                    ) : (
+                                        <>
+                                            <Button 
+                                                variant="outline" 
+                                                asChild
+                                                className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
+                                            >
+                                                <Link href="/auth/login">تسجيل الدخول</Link>
+                                            </Button>
+                                            <Button 
+                                                asChild
+                                                className="bg-orange-500 hover:bg-orange-600 text-white"
+                                            >
+                                                <Link href="/auth/register">إنشاء حساب</Link>
+                                            </Button>
+                                        </>
+                                    )}
+                                </>
+                            )}
+                        </div>
+
+                        {/* Mobile Menu */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="lg:hidden text-gray-700 hover:text-orange-500 hover:bg-orange-50"
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        >
+                            {isMobileMenuOpen ? (
+                                <X className="h-5 w-5" />
+                            ) : (
+                                <Menu className="h-5 w-5" />
+                            )}
+                            <span className="sr-only">قائمة</span>
+                        </Button>
                     </div>
                 </div>
-            </div>
 
-            {/* Mobile menu */}
-            {isMobileMenuOpen && (
-                <div className="md:hidden mt-3 px-4">
-                    <div className="bg-white rounded-lg shadow p-4 space-y-3 animate-fadeIn">
-                        <ul className="flex flex-col gap-2">
-                            {navItems.map((item) => {
-                                const active = pathname === item.href;
-                                return (
-                                    <li
-                                        key={item.href}
-                                        onClick={() => navigate(item.href)}
-                                        className={`py-2 px-3 rounded-md cursor-pointer transition ${active
-                                            ? "bg-orange-500 text-white font-semibold"
-                                            : "hover:bg-gray-50 text-gray-700"
+                {/* Mobile Navigation Menu */}
+                {isMobileMenuOpen && (
+                    <div className="lg:hidden absolute start-0 end-0 border-t bg-white shadow-lg">
+                        <div className="container mx-auto px-4 py-4">
+                            <nav className="flex flex-col space-y-2">
+                                {navItems.map((navItem) => {
+                                    const isActive = pathname === navItem.href;
+
+                                    return (
+                                        <Link
+                                            key={navItem.href}
+                                            href={navItem.href}
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                                isActive
+                                                    ? "bg-orange-500 text-white shadow-sm"
+                                                    : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
                                             }`}
-                                    >
-                                        {item.label}
-                                    </li>
-                                );
-                            })}
-                        </ul>
-
-                        <div className="flex gap-2 pt-2">
-                            <Button
-                                onClick={() => navigate("/signup")}
-                                className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-                            >
-                                إنشاء حساب
-                            </Button>
-                            <Button
-                                onClick={() => navigate("/login")}
-                                className="flex-1 px-4 py-2 border border-orange-500 text-orange-500 rounded-lg hover:bg-orange-500 hover:text-white"
-                            >
-                                تسجيل الدخول
-                            </Button>
+                                        >
+                                            {navItem.label}
+                                        </Link>
+                                    );
+                                })}
+                                
+                                {/* Mobile Auth Buttons */}
+                                <div className="flex gap-2 pt-2 mt-2 border-t">
+                                    {isAuthenticated ? (
+                                        <Button 
+                                            variant="outline"
+                                            onClick={handleLogout}
+                                            className="flex-1 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
+                                        >
+                                            تسجيل الخروج
+                                        </Button>
+                                    ) : (
+                                        <>
+                                            <Button 
+                                                asChild
+                                                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+                                            >
+                                                <Link href="/auth/register">إنشاء حساب</Link>
+                                            </Button>
+                                            <Button 
+                                                variant="outline"
+                                                asChild
+                                                className="flex-1 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
+                                            >
+                                                <Link href="/auth/login">تسجيل الدخول</Link>
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
+                            </nav>
                         </div>
                     </div>
-                </div>
-            )}
-        </nav>
-
+                )}
+            </div>
+        </header>
     );
-};
+}
 
 export default Navbar;
