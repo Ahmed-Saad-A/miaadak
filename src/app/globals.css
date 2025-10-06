@@ -11,6 +11,16 @@
   }
 
   body {
-    @apply bg-white;
+    @apply bg-white text-gray-950;
+  }
+
+    button {
+    @apply cursor-pointer;
+  }
+}
+
+@layer utilities {
+  .container {
+    @apply mx-auto max-w-11/12 px-4 sm:px-6 lg:px-8;
   }
 }
