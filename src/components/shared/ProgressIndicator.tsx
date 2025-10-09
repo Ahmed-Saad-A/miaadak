@@ -24,10 +24,10 @@ const ProgressIndicator = ({ currentStep, totalSteps }: ProgressIndicatorProps) 
                   w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold
                   transition-all duration-300
                   ${isActive 
-                    ? 'bg-[#00FF9C] text-white shadow-lg shadow-[#00FF9C]/30' 
+                    ? 'bg-[#ff751f] text-white shadow-lg shadow-[#ff751f]/30' 
                     : isCompleted 
-                    ? 'bg-[#00FF9C] text-white' 
-                    : 'bg-gray-200 text-gray-500'
+                    ? 'bg-[#ff751f] text-white' 
+                    : 'bg-[#d6d6d6] text-gray-500'
                   }
                 `}
                 animate={isActive ? { scale: [1, 1.1, 1] } : {}}
@@ -43,7 +43,7 @@ const ProgressIndicator = ({ currentStep, totalSteps }: ProgressIndicatorProps) 
                   initial={{ width: 0 }}
                   animate={{ 
                     width: isCompleted ? 64 : 0,
-                    backgroundColor: isCompleted ? '#00FF9C' : '#e5e7eb'
+                    backgroundColor: isCompleted ? '#ff751f' : '#d6d6d6'
                   }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 />

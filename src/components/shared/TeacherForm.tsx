@@ -89,11 +89,11 @@ const TeacherForm = () => {
             type="text"
             value={formData.firstName}
             onChange={(e) => handleInputChange("firstName", e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#00FF9C] focus:ring-2 focus:ring-[#00FF9C]/20 transition-all duration-200"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20 transition-all duration-200"
             placeholder="أدخل اسمك الأول"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             الاسم الأخير
@@ -102,11 +102,11 @@ const TeacherForm = () => {
             type="text"
             value={formData.lastName}
             onChange={(e) => handleInputChange("lastName", e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#00FF9C] focus:ring-2 focus:ring-[#00FF9C]/20 transition-all duration-200"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20 transition-all duration-200"
             placeholder="أدخل اسمك الأخير"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             البريد الإلكتروني
@@ -115,7 +115,7 @@ const TeacherForm = () => {
             type="email"
             value={formData.email}
             onChange={(e) => handleInputChange("email", e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#00FF9C] focus:ring-2 focus:ring-[#00FF9C]/20 transition-all duration-200"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20 transition-all duration-200"
             placeholder="أدخل بريدك الإلكتروني"
           />
         </div>
@@ -143,11 +143,11 @@ const TeacherForm = () => {
             type="password"
             value={formData.password}
             onChange={(e) => handleInputChange("password", e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#00FF9C] focus:ring-2 focus:ring-[#00FF9C]/20 transition-all duration-200"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20 transition-all duration-200"
             placeholder="أدخل كلمة المرور"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             تأكيد كلمة المرور
@@ -156,7 +156,7 @@ const TeacherForm = () => {
             type="password"
             value={formData.confirmPassword}
             onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#00FF9C] focus:ring-2 focus:ring-[#00FF9C]/20 transition-all duration-200"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20 transition-all duration-200"
             placeholder="أعد إدخال كلمة المرور"
           />
         </div>
@@ -184,41 +184,36 @@ const TeacherForm = () => {
             type="tel"
             value={formData.phoneNumber}
             onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#00FF9C] focus:ring-2 focus:ring-[#00FF9C]/20 transition-all duration-200"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20 transition-all duration-200"
             placeholder="أدخل رقم هاتفك"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             الجنس
           </label>
-          <div className="flex space-x-4 rtl:space-x-reverse">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="gender"
-                value="male"
-                checked={formData.gender === "male"}
-                onChange={(e) => handleInputChange("gender", e.target.value)}
-                className="mr-2 text-[#00FF9C] focus:ring-[#00FF9C]"
-              />
-              ذكر
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                name="gender"
-                value="female"
-                checked={formData.gender === "female"}
-                onChange={(e) => handleInputChange("gender", e.target.value)}
-                className="mr-2 text-[#00FF9C] focus:ring-[#00FF9C]"
-              />
-              أنثى
-            </label>
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { label: "ذكر", value: "male" },
+              { label: "أنثى", value: "female" },
+            ].map((option) => (
+              <div
+                key={option.value}
+                onClick={() => handleInputChange("gender", option.value)}
+                className={`cursor-pointer rounded-2xl border-2 p-4 text-center font-semibold transition-all duration-300 
+          ${formData.gender === option.value
+                    ? "border-[#ff751f] bg-[#ff751f]/10 text-[#ff751f] scale-105 shadow-sm"
+                    : "border-gray-300 hover:border-[#ff751f]/50 hover:bg-gray-50"
+                  }`}
+              >
+                {option.label}
+              </div>
+            ))}
           </div>
         </div>
-        
+
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             القسم أو التخصص
@@ -227,7 +222,7 @@ const TeacherForm = () => {
             type="text"
             value={formData.department}
             onChange={(e) => handleInputChange("department", e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#00FF9C] focus:ring-2 focus:ring-[#00FF9C]/20 transition-all duration-200"
+            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20 transition-all duration-200"
             placeholder="أدخل القسم أو التخصص"
           />
         </div>
@@ -268,7 +263,7 @@ const TeacherForm = () => {
 
           <motion.button
             onClick={currentStep === 3 ? handleSubmit : nextStep}
-            className="px-6 py-3 bg-[#00FF9C] text-white rounded-full font-medium hover:bg-[#00E68A] transition-all duration-200"
+            className="px-6 py-3 bg-[#ff751f] text-white rounded-full font-medium hover:bg-[#da9752] transition-all duration-200"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >

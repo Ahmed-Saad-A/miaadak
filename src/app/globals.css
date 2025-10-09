@@ -17,6 +17,10 @@
     button {
     @apply cursor-pointer;
   }
+
+  input, textarea {
+    @apply text-right placeholder:text-right;
+  }
 }
 
 @layer utilities {
