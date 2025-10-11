@@ -124,8 +124,8 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
             const response = await servicesApi.registerUser(registrationData);
 
             if (response.isSucceeded) {
-                toast.success('تم التسجيل بنجاح!');
-                router.push('/auth/login');
+                toast.success('تم التسجيل بنجاح! يرجى التحقق من بريدك الإلكتروني');
+                router.push(`/auth/register/confirm-email?email=${encodeURIComponent(registrationData.email)}`);
             } else {
                 toast.error(response.message || 'حدث خطأ أثناء التسجيل');
             }

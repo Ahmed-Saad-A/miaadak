@@ -9,7 +9,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="relative overflow-hidden min-h-screen bg-[#F3F5F7] w-full flex items-center justify-center">
+    <div className="relative overflow-hidden sm:min-h-screen h-screen bg-[#F3F5F7] w-full flex items-center justify-center">
       {/* الدوائر المتحركة */}
       <motion.div
         className="absolute z-1 top-24 left-16 w-32 h-32 bg-orange-100 rounded-full"
@@ -24,21 +24,21 @@ export default function Home() {
 
       <main className="relative w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center px-6 py-12 md:py-0">
         {/* Right Section */}
-        <div className="flex justify-center md:justify-end mt-10 md:mt-0">
+        <div className="flex justify-center md:justify-star">
           <AnimatedSide />
         </div>
 
         {/* Left Section */}
-        <div className="relative flex flex-col justify-center items-center md:items-start text-center md:text-right w-full min-h-[30vh] md:h-[100vh] mt-16 md:mt-0">
+        <div className="flex flex-col mt-24 justify-start items-center md:items-start text-center md:text-right w-full min-h-[30vh] md:h-[100vh] md:mt-0">
           {/* اللوجو */}
           <Image
             src={logo}
             alt="logo"
-            className="sm:w-full md:w-full object-contain drop-shadow-lg relative z-10"
+            className="sm:w-full md:w-full object-contain drop-shadow-lg z-10"
           />
 
           {/* النصوص - فوق اللوجو مباشرة */}
-          <div className="relative w-full text-center mt-8 md:absolute md:top-[70%] md:right-0 md:translate-y-[-50%] z-20">
+          <div className="w-full text-center mt-16 md:top-[70%] md:right-0 md:translate-y-[-50%] z-20">
             <h1 className="w-full text-center md:text-center text-3xl md:text-5xl font-extrabold text-blue-900 leading-tight mb-3 sm:mb-16">
               أهلاً بك في <span className="text-orange-500">ميعادك</span>
             </h1>
