@@ -219,7 +219,7 @@ const ConfirmEmailPage = () => {
                                     ) : (
                                         <>
                                             <RefreshCw className="h-5 w-5 ml-2" />
-                                            أعيد إرسال الكود
+                                            أعد إرسال رابط التحقق
                                         </>
                                     )}
                                 </motion.button>
