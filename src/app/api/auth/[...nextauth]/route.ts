@@ -1,6 +1,7 @@
 import { servicesApi } from "@/services/api";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { jwtDecode } from "jwt-decode";
 
 interface AuthToken {
     accessToken: string;
@@ -9,6 +10,27 @@ interface AuthToken {
     refreshTokenExpires?: number;
     error?: string;
 }
+
+interface DecodedToken {
+    "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string;
+    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"?: string;
+    email?: string;
+    [key: string]: any;
+}
+
+// Map role numbers to role names
+const getRoleName = (roleNumber: string | number): string => {
+    switch (String(roleNumber)) {
+        case "1":
+            return "Teacher";
+        case "2":
+            return "Student";
+        case "3":
+            return "Parent";
+        default:
+            return "Unknown";
+    }
+};
 
 const handler = NextAuth({
     providers: [
@@ -22,17 +44,44 @@ const handler = NextAuth({
                 if (!credentials?.email || !credentials?.password) return null;
 
                 const res = await servicesApi.loginUser(credentials.email, credentials.password);
+                console.log("🚀 ~ authorize ~ res:", res)
 
                 if (res.success) {
-                    return {
-                        id: credentials.email,
-                        email: credentials.email,
-                        accessToken: res.jwt,
-                        refreshToken: res.refreshToken,
-                        accessTokenExpires: new Date(res.jwtExpireDate).getTime(),
-                        refreshTokenExpires: new Date(res.refreshExpireDate).getTime(),
-                    };
+                    try {
+                        // Decode JWT to get user role
+                        const decoded: DecodedToken = jwtDecode(res.jwt);
+                        const roleFromToken = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                        console.log("🚀 ~ authorize ~ roleFromToken:", roleFromToken);
+
+                        // If the role is already a name, use it, otherwise map number to name
+                        const roleName = ["Teacher", "Student", "Parent"].includes(roleFromToken || "")
+                            ? roleFromToken
+                            : getRoleName(roleFromToken || "");
+                        console.log("🚀 ~ authorize ~ roleName:", roleName);
+
+                        const email =
+                            decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
+                            decoded.email ||
+                            credentials.email;
+                        console.log("🚀 ~ authorize ~ email:", email);
+
+                        return {
+                            id: credentials.email,
+                            email: email,
+                            name: email, // يمكنك إضافة اسم إذا متاح
+                            role: roleName,
+                            roleNumber: roleFromToken,
+                            accessToken: res.jwt,
+                            refreshToken: res.refreshToken,
+                            accessTokenExpires: new Date(res.jwtExpireDate).getTime(),
+                            refreshTokenExpires: new Date(res.refreshExpireDate).getTime(),
+                        };
+                    } catch (error) {
+                        console.error("Error decoding JWT:", error);
+                        return null;
+                    }
                 }
+
 
                 return null;
             },
@@ -48,6 +97,8 @@ const handler = NextAuth({
                 token.refreshToken = user.refreshToken;
                 token.accessTokenExpires = user.accessTokenExpires;
                 token.refreshTokenExpires = user.refreshTokenExpires;
+                token.role = user.role;
+                token.roleNumber = user.roleNumber;
             }
 
             if (Date.now() < token.accessTokenExpires) return token;
@@ -60,6 +111,8 @@ const handler = NextAuth({
                 ...session.user,
                 accessToken: token.accessToken,
                 refreshToken: token.refreshToken,
+                role: token.role,
+                roleNumber: token.roleNumber,
             };
             return session;
         },

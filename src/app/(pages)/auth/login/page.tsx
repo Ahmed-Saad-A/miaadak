@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AnimatedSide } from "@/components/shared";
 
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +24,8 @@ const LoginPage = () => {
         if (result?.error) {
             alert("خطأ في البريد أو كلمة المرور");
         } else {
-            router.push("/teachers");
+            // Redirect to home page after successful login
+            router.push("/");
         }
     };
 
@@ -78,7 +80,7 @@ const LoginPage = () => {
             </div>
 
             <div className="order-1 flex justify-center md:justify-start">
-                {/* <AnimatedSide /> */}
+                <AnimatedSide />
             </div>
         </main>
     );
