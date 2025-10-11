@@ -1,42 +1,109 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { AnimatedSide } from "@/components/shared";
-import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
+import { Mail, ArrowLeft, CheckCircle, Loader2, EyeOff, Eye } from "lucide-react";
+import { servicesApi } from "@/services/api";
+import toast from "react-hot-toast";
 
 const ForgotPasswordPage = () => {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
   const [focusedIndex, setFocusedIndex] = useState(0);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleEmailSubmit = () => {
-    if (email) {
-      setCurrentStep(2);
+  const handleEmailSubmit = async () => {
+    if (!email) return;
+
+    setIsLoading(true);
+    toast.loading("جارٍ إرسال رمز التحقق...", { id: "send-code" });
+
+    try {
+      const response = await servicesApi.sendVerificationCode(email);
+
+      if (response.isSucceeded) {
+        toast.success("تم إرسال رمز التحقق بنجاح", { id: "send-code" });
+        setCurrentStep(2);
+      } else {
+        toast.error(response.message || "فشل في إرسال رمز التحقق", { id: "send-code" });
+      }
+    } catch (error) {
+      console.error("Error sending verification code:", error);
+      toast.error("حدث خطأ في إرسال رمز التحقق", { id: "send-code" });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleVerificationSubmit = () => {
-    if (verificationCode.every(digit => digit !== "")) {
-      setCurrentStep(3);
+  const handleVerificationSubmit = async () => {
+    if (!verificationCode.every(digit => digit !== "")) return;
+
+    setIsLoading(true);
+    toast.loading("جارٍ التحقق من الرمز...", { id: "verify-code" });
+
+    try {
+      const code = verificationCode.join("");
+      const response = await servicesApi.verifyCode(email, code);
+
+      if (response.isSucceeded) {
+        toast.success("تم التحقق من الرمز بنجاح", { id: "verify-code" });
+        setCurrentStep(3);
+      } else {
+        toast.error(response.message || "رمز التحقق غير صحيح", { id: "verify-code" });
+      }
+    } catch (error) {
+      console.error("Error verifying code:", error);
+      toast.error("حدث خطأ في التحقق من الرمز", { id: "verify-code" });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDigitChange = (index: number, value: string) => {
+    const cleanValue = value.replace(/\D/g, '').slice(0, 1); // رقم واحد فقط
     const newCode = [...verificationCode];
-    newCode[index] = value.replace(/\D/g, '').slice(0, 1);
+    newCode[index] = cleanValue;
     setVerificationCode(newCode);
-    
-    // Move to next empty field
-    if (value && index < 5) {
+
+    // التحرك للخانة التالية لو كتب رقم
+    if (cleanValue && index < 5) {
       setFocusedIndex(index + 1);
     }
   };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData('text').replace(/\D/g, ''); // ناخد أرقام فقط
+    const digits = pasteData.slice(0, 6).split('');
+
+    const newCode = [...verificationCode];
+    for (let i = 0; i < 6; i++) {
+      newCode[i] = digits[i] || '';
+    }
+
+    setVerificationCode(newCode);
+    setFocusedIndex(Math.min(digits.length, 5));
+  };
+
+
+
+  const inputRefs = useRef<HTMLInputElement[]>([]);
+
+  useEffect(() => {
+    if (inputRefs.current[focusedIndex]) {
+      inputRefs.current[focusedIndex].focus();
+    }
+  }, [focusedIndex]);
+
+
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
     if (e.key === 'Backspace' && !verificationCode[index] && index > 0) {
@@ -44,12 +111,26 @@ const ForgotPasswordPage = () => {
     }
   };
 
-  const handlePasswordSubmit = () => {
-    if (newPassword && confirmPassword && newPassword === confirmPassword) {
-      // Handle password reset
-      console.log("Password reset successful");
-      // Navigate to success page
-      router.push("/auth/forgot-password/success");
+  const handlePasswordSubmit = async () => {
+    if (!newPassword || !confirmPassword || newPassword !== confirmPassword) return;
+
+    setIsLoading(true);
+    toast.loading("جارٍ إعادة تعيين كلمة المرور...", { id: "reset-password" });
+
+    try {
+      const response = await servicesApi.resetPassword(email, newPassword, confirmPassword);
+
+      if (response.isSucceeded) {
+        toast.success("تم إعادة تعيين كلمة المرور بنجاح", { id: "reset-password" });
+        router.push("/auth/forgot-password/success");
+      } else {
+        toast.error(response.message || "فشل في إعادة تعيين كلمة المرور", { id: "reset-password" });
+      }
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      toast.error("حدث خطأ في إعادة تعيين كلمة المرور", { id: "reset-password" });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -104,18 +185,25 @@ const ForgotPasswordPage = () => {
 
       <motion.button
         onClick={handleEmailSubmit}
-        disabled={!email}
+        disabled={!email || isLoading}
         className={`
-          w-full px-6 py-3 rounded-full font-medium transition-all duration-200
-          ${email 
-            ? 'bg-[#ff751f] text-white hover:bg-[#da9752]' 
+          w-full px-6 py-3 rounded-full font-medium transition-all duration-200 flex items-center justify-center
+          ${email && !isLoading
+            ? 'bg-[#ff751f] text-white hover:bg-[#da9752]'
             : 'bg-[#d6d6d6] text-gray-500 cursor-not-allowed'
           }
         `}
-        whileHover={email ? { scale: 1.02 } : {}}
-        whileTap={email ? { scale: 0.98 } : {}}
+        whileHover={email && !isLoading ? { scale: 1.02 } : {}}
+        whileTap={email && !isLoading ? { scale: 0.98 } : {}}
       >
-        تأكيد الإيميل
+        {isLoading ? (
+          <>
+            <Loader2 className="h-5 w-5 animate-spin ml-2" />
+            جارٍ الإرسال...
+          </>
+        ) : (
+          "تأكيد الإيميل"
+        )}
       </motion.button>
     </motion.div>
   );
@@ -147,25 +235,28 @@ const ForgotPasswordPage = () => {
           <label className="block text-sm font-medium text-gray-700 mb-6 text-center">
             أدخل رمز التحقق
           </label>
-          
+
           {/* 6 Individual Square Boxes - Single Line Layout */}
-          <div className="flex justify-center space-x-2 rtl:space-x-reverse">
+          <div className="flex justify-center space-x-2 ltr:space-x-reverse">
             {verificationCode.map((digit, index) => (
               <input
+                ref={(el) => { inputRefs.current[index] = el!; }}
                 key={index}
                 type="text"
                 value={digit}
                 onChange={(e) => handleDigitChange(index, e.target.value)}
+                onPaste={index === 0 ? handlePaste : undefined}
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 onFocus={() => setFocusedIndex(index)}
                 maxLength={1}
+                dir="ltr"
                 className={`
                   w-12 h-12 text-center text-xl font-bold rounded-lg border-2 transition-all duration-200
                   ${focusedIndex === index
                     ? 'border-[#ff751f] ring-2 ring-[#ff751f] ring-opacity-20 bg-white'
                     : digit
-                    ? 'border-[#ff751f] bg-[#ff751f] text-white'
-                    : 'border-[#d6d6d6] bg-white text-gray-400'
+                      ? 'border-[#ff751f] bg-[#ff751f] text-white'
+                      : 'border-[#d6d6d6] bg-white text-gray-400'
                   }
                   focus:outline-none focus:ring-2 focus:ring-[#ff751f] focus:ring-opacity-20
                 `}
@@ -194,18 +285,25 @@ const ForgotPasswordPage = () => {
 
       <motion.button
         onClick={handleVerificationSubmit}
-        disabled={!verificationCode.every(digit => digit !== "")}
+        disabled={!verificationCode.every(digit => digit !== "") || isLoading}
         className={`
-          w-full px-6 py-3 rounded-full font-medium transition-all duration-200
-          ${verificationCode.every(digit => digit !== "")
-            ? 'bg-[#ff751f] text-white hover:bg-[#da9752]' 
+          w-full px-6 py-3 rounded-full font-medium transition-all duration-200 flex items-center justify-center
+          ${verificationCode.every(digit => digit !== "") && !isLoading
+            ? 'bg-[#ff751f] text-white hover:bg-[#da9752]'
             : 'bg-[#d6d6d6] text-gray-500 cursor-not-allowed'
           }
         `}
-        whileHover={verificationCode.every(digit => digit !== "") ? { scale: 1.02 } : {}}
-        whileTap={verificationCode.every(digit => digit !== "") ? { scale: 0.98 } : {}}
+        whileHover={verificationCode.every(digit => digit !== "") && !isLoading ? { scale: 1.02 } : {}}
+        whileTap={verificationCode.every(digit => digit !== "") && !isLoading ? { scale: 0.98 } : {}}
       >
-        تأكيد الرمز
+        {isLoading ? (
+          <>
+            <Loader2 className="h-5 w-5 animate-spin ml-2" />
+            جارٍ التحقق...
+          </>
+        ) : (
+          "تأكيد الرمز"
+        )}
       </motion.button>
     </motion.div>
   );
@@ -230,47 +328,76 @@ const ForgotPasswordPage = () => {
       </div>
 
       <div className="space-y-4">
-        <div>
+        {/* كلمة المرور الجديدة */}
+        <div className="relative">
           <label className="block text-sm font-medium text-gray-700 mb-2 text-right">
             كلمة المرور الجديدة
           </label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20 transition-all duration-200 text-right"
-            placeholder="أدخل كلمة المرور الجديدة"
-          />
+          <div className="relative">
+
+            <input
+              type={showPassword ? "text" : "password"}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20 transition-all duration-200 text-right"
+              placeholder="أدخل كلمة المرور الجديدة"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute left-3 top-3 text-gray-500 hover:text-orange-500 transition"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
         </div>
-        
-        <div>
+
+        {/* تأكيد كلمة المرور */}
+        <div className="relative">
           <label className="block text-sm font-medium text-gray-700 mb-2 text-right">
             تأكيد كلمة المرور
           </label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20 transition-all duration-200 text-right"
-            placeholder="أعد إدخال كلمة المرور"
-          />
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20 transition-all duration-200 text-right"
+              placeholder="أعد إدخال كلمة المرور"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute left-3 top-3 text-gray-500 hover:text-orange-500 transition"
+            >
+              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
         </div>
       </div>
 
+
       <motion.button
         onClick={handlePasswordSubmit}
-        disabled={!newPassword || !confirmPassword || newPassword !== confirmPassword}
+        disabled={!newPassword || !confirmPassword || newPassword !== confirmPassword || isLoading}
         className={`
-          w-full px-6 py-3 rounded-full font-medium transition-all duration-200
-          ${newPassword && confirmPassword && newPassword === confirmPassword
-            ? 'bg-[#ff751f] text-white hover:bg-[#da9752]' 
+          w-full px-6 py-3 rounded-full font-medium transition-all duration-200 flex items-center justify-center
+          ${newPassword && confirmPassword && newPassword === confirmPassword && !isLoading
+            ? 'bg-[#ff751f] text-white hover:bg-[#da9752]'
             : 'bg-[#d6d6d6] text-gray-500 cursor-not-allowed'
           }
         `}
-        whileHover={newPassword && confirmPassword && newPassword === confirmPassword ? { scale: 1.02 } : {}}
-        whileTap={newPassword && confirmPassword && newPassword === confirmPassword ? { scale: 0.98 } : {}}
+        whileHover={newPassword && confirmPassword && newPassword === confirmPassword && !isLoading ? { scale: 1.02 } : {}}
+        whileTap={newPassword && confirmPassword && newPassword === confirmPassword && !isLoading ? { scale: 0.98 } : {}}
       >
-        إعادة تعيين كلمة المرور
+        {isLoading ? (
+          <>
+            <Loader2 className="h-5 w-5 animate-spin ml-2" />
+            جارٍ إعادة التعيين...
+          </>
+        ) : (
+          "إعادة تعيين كلمة المرور"
+        )}
       </motion.button>
     </motion.div>
   );
@@ -306,8 +433,8 @@ const ForgotPasswordPage = () => {
                         <motion.div
                           className={`
                             w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold
-                            ${currentStep >= step 
-                              ? 'bg-[#ff751f] text-white' 
+                            ${currentStep >= step
+                              ? 'bg-[#ff751f] text-white'
                               : 'bg-[#d6d6d6] text-gray-500'
                             }
                           `}
@@ -319,7 +446,7 @@ const ForgotPasswordPage = () => {
                         {step < 3 && (
                           <motion.div
                             className="w-8 h-1 mx-2"
-                            animate={{ 
+                            animate={{
                               backgroundColor: currentStep > step ? '#ff751f' : '#d6d6d6'
                             }}
                             transition={{ duration: 0.5 }}
@@ -338,7 +465,7 @@ const ForgotPasswordPage = () => {
               </motion.div>
             </div>
           </div>
-          
+
           {/* Right side - Animated Side */}
           <div className="order-1 lg:order-2">
             <AnimatedSide />

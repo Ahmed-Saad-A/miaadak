@@ -2,12 +2,15 @@
 import React, { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Mail } from "lucide-react";
+import { Eye, EyeOff, Mail, Loader2, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AnimatedSide } from "@/components/shared";
+import toast from "react-hot-toast";
+import Link from "next/link";
 
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
@@ -15,16 +18,27 @@ const LoginPage = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        setIsLoading(true);
+        toast.loading("جارٍ تسجيل الدخول...", { id: "login" });
+
         const result = await signIn("credentials", {
             redirect: false,
             email,
             password,
         });
 
-        if (result?.error) {
-            alert("خطأ في البريد أو كلمة المرور");
-        } else {
-            // Redirect to home page after successful login
+        setIsLoading(false);
+        toast.dismiss("login");
+
+        if (result?.status === 401) {
+            toast.error("خطأ في البريد الإلكتروني أو كلمة المرور");
+        }
+        else if (result?.status === 403) {
+            toast.error("حساب غير مفعل. يرجى التحقق من بريدك الإلكتروني.");
+        }
+
+        else {
+            toast.success("تم تسجيل الدخول بنجاح 🎉");
             router.push("/");
         }
     };
@@ -50,6 +64,7 @@ const LoginPage = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full border border-gray-300 rounded-lg py-3 pl-10 pr-4 text-right focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none transition"
+                            required
                         />
                     </div>
 
@@ -60,6 +75,7 @@ const LoginPage = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full border border-gray-300 rounded-lg py-3 pl-10 pr-4 text-right focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none transition"
+                            required
                         />
                         <button
                             type="button"
@@ -70,12 +86,47 @@ const LoginPage = () => {
                         </button>
                     </div>
 
+                    <div className="text-right mt-2 mb-3">
+                        <Link
+                            href="/auth/forgot-password"
+                            className="text-sm text-blue-700 hover:text-orange-500 transition"
+                        >
+                            هل نسيت كلمة المرور؟
+                        </Link>
+                    </div>
+
+
                     <Button
                         type="submit"
-                        className="w-full bg-orange-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 transition"
+                        className="w-full bg-orange-500 text-white py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 transition flex items-center justify-center"
+                        disabled={isLoading}
                     >
-                        تسجيل الدخول
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                جاري تسجيل الدخول...
+                            </>
+                        ) : (
+                            <>
+                                <LogIn className="h-5 w-5 mr-2" />
+                                تسجيل الدخول
+                            </>
+                        )}
                     </Button>
+
+                    {/* 🔹 الروابط الجديدة */}
+                    <div className="flex flex-col items-center space-y-2 mt-4">
+
+                        <p className="text-sm text-gray-600">
+                            ليس لديك حساب؟{" "}
+                            <Link
+                                href="/register"
+                                className="text-orange-500 font-semibold hover:underline"
+                            >
+                                إنشاء حساب
+                            </Link>
+                        </p>
+                    </div>
                 </form>
             </div>
 

@@ -83,6 +83,42 @@ class ServicesApi {
         }
     }
 
+    async sendVerificationCode(email: string): Promise<ApiResponse<null>> {
+        const response = await fetch(`${this.#baseUrl}api/v1/Account/SendVerifyCode`, {
+            method: "POST",
+            headers: this.#getHeaders(),
+            body: JSON.stringify({ email }),
+        });
+        return (await response.json()) as ApiResponse<null>;
+    }
+
+    async verifyCode(email: string, code: string): Promise<ApiResponse<null>> {
+        const response = await fetch(`${this.#baseUrl}api/v1/Account/VerifyCode`, {
+            method: "POST",
+            headers: this.#getHeaders(),
+            body: JSON.stringify({ email, code }),
+        });
+        return (await response.json()) as ApiResponse<null>;
+    }
+
+    async resetPassword(email: string, password: string, confirmPassword: string): Promise<ApiResponse<null>> {
+        const response = await fetch(`${this.#baseUrl}api/v1/Account/ResetPassword`, {
+            method: "POST",
+            headers: this.#getHeaders(),
+            body: JSON.stringify({ email, password, confirmPassword }),
+        });
+        return (await response.json()) as ApiResponse<null>;
+    }
+
+    async resendConfirmationEmail(email: string): Promise<ApiResponse<null>> {
+        const response = await fetch(`${this.#baseUrl}api/v1/Account/ResendConfirmation`, {
+            method: "POST",
+            headers: this.#getHeaders(),
+            body: JSON.stringify({ email }),
+        });
+        return (await response.json()) as ApiResponse<null>;
+    }
+
 }
 
 
