@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import student from "../../assets/student.png";
+import student from "@/assets/student.png";
 
 const AnimatedSide = () => {
     return (

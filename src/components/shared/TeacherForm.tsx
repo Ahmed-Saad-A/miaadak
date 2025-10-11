@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import ProgressIndicator from "../shared/ProgressIndicator";
+import ProgressIndicator from "@/components/shared/ProgressIndicator";
 import { useRegistration } from "@/hooks";
 import { USER_ROLES, GENDER } from "@/interfaces";
 import toast from "react-hot-toast";

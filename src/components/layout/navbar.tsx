@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { UserDropdown } from "@/components/ui/user-dropdown";
 import React, { useState } from "react";
 import Image from "next/image";
-import MainLogo from "../../assets/mainLogo.png";
+import MainLogo from "@/assets/mainLogo.png";
 import { useSession, signOut } from "next-auth/react";
 
 export function Navbar() {

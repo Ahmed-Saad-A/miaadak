@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { AnimatedSide } from "@/components/shared";
-import { Mail, ArrowLeft, CheckCircle, Loader2, EyeOff, Eye } from "lucide-react";
+import { Mail, ArrowLeft, CheckCircle, Loader2, EyeOff, Eye, Clock, RefreshCw } from "lucide-react";
 import { servicesApi } from "@/services/api";
 import toast from "react-hot-toast";
 
@@ -19,6 +19,27 @@ const ForgotPasswordPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(120); // 2 minutes in seconds
+  const [isResendEnabled, setIsResendEnabled] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+
+  // Countdown timer
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timer = setTimeout(() => {
+        setTimeLeft(timeLeft - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setIsResendEnabled(true);
+    }
+  }, [timeLeft]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handleEmailSubmit = async () => {
     if (!email) return;
@@ -32,6 +53,8 @@ const ForgotPasswordPage = () => {
       if (response.isSucceeded) {
         toast.success("تم إرسال رمز التحقق بنجاح", { id: "send-code" });
         setCurrentStep(2);
+        setTimeLeft(120); // Reset timer to 2 minutes
+        setIsResendEnabled(false);
       } else {
         toast.error(response.message || "فشل في إرسال رمز التحقق", { id: "send-code" });
       }
@@ -40,6 +63,32 @@ const ForgotPasswordPage = () => {
       toast.error("حدث خطأ في إرسال رمز التحقق", { id: "send-code" });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!email || isResending) return;
+
+    setIsResending(true);
+    toast.loading("جارٍ إعادة إرسال رمز التحقق...", { id: "resend-code" });
+
+    try {
+      const response = await servicesApi.sendVerificationCode(email);
+
+      if (response.isSucceeded) {
+        toast.success("تم إعادة إرسال رمز التحقق بنجاح", { id: "resend-code" });
+        setTimeLeft(120); // Reset timer to 2 minutes
+        setIsResendEnabled(false);
+        setVerificationCode(["", "", "", "", "", ""]); // Clear the code inputs
+        setFocusedIndex(0);
+      } else {
+        toast.error(response.message || "فشل في إعادة إرسال رمز التحقق", { id: "resend-code" });
+      }
+    } catch (error) {
+      console.error("Error resending verification code:", error);
+      toast.error("حدث خطأ في إعادة إرسال رمز التحقق", { id: "resend-code" });
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -225,7 +274,13 @@ const ForgotPasswordPage = () => {
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">تحقق من بريدك الإلكتروني</h2>
         <p className="text-gray-600">
-          تم إرسال رمز التحقق إلى <span className="font-semibold text-[#ff751f]">{email}</span>
+          تم إرسال رمز التحقق إلى{" "}
+          <button
+            onClick={() => window.open(`mailto:${email}`, '_blank')}
+            className="font-semibold text-[#ff751f] hover:text-[#da9752] hover:underline transition-colors cursor-pointer"
+          >
+            {email}
+          </button>
         </p>
         <p className="text-sm text-gray-500 mt-2">أدخل الرمز المكون من 6 أرقام في المربعات أدناه</p>
       </div>
@@ -281,6 +336,56 @@ const ForgotPasswordPage = () => {
             </div>
           )}
         </div>
+
+        {/* Countdown Timer */}
+        <div className="text-center mb-6">
+          <div className="flex items-center justify-center mb-3">
+            <Clock className="w-5 h-5 text-gray-400 ml-2" />
+            <span className="text-sm text-gray-600">يمكنك إعادة الإرسال خلال:</span>
+          </div>
+          
+          <motion.div
+            key={timeLeft}
+            initial={{ scale: 1.1 }}
+            animate={{ scale: 1 }}
+            className="text-2xl font-bold text-[#ff751f] mb-2"
+          >
+            {formatTime(timeLeft)}
+          </motion.div>
+          
+          {!isResendEnabled && (
+            <p className="text-xs text-gray-500">
+              انتظر حتى انتهاء العد التنازلي لإعادة الإرسال
+            </p>
+          )}
+        </div>
+
+        {/* Resend Button */}
+        <motion.button
+          onClick={handleResendCode}
+          disabled={!isResendEnabled || isResending}
+          className={`
+            w-full px-6 py-3 rounded-full font-medium transition-all duration-200 flex items-center justify-center mb-4
+            ${isResendEnabled && !isResending
+              ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              : 'bg-[#d6d6d6] text-gray-500 cursor-not-allowed'
+            }
+          `}
+          whileHover={isResendEnabled && !isResending ? { scale: 1.02 } : {}}
+          whileTap={isResendEnabled && !isResending ? { scale: 0.98 } : {}}
+        >
+          {isResending ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin ml-2" />
+              جارٍ الإرسال...
+            </>
+          ) : (
+            <>
+              <RefreshCw className="h-5 w-5 ml-2" />
+              أعيد إرسال الكود
+            </>
+          )}
+        </motion.button>
       </div>
 
       <motion.button

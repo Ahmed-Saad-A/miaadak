@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import AnimatedSide from "@/components/shared/AnimatedSide";
-import logo from "../assets/logo.png";
+import logo from "@/assets/logo.png";
 import { Button } from "@/components";
 import Link from "next/link";
 
