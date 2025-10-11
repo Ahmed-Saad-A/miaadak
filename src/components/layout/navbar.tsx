@@ -1,91 +1,70 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { UserDropdown } from "@/components/ui/user-dropdown";
 import React, { useState } from "react";
 import Image from "next/image";
 import MainLogo from "../../assets/mainLogo.png";
+import { useSession, signOut } from "next-auth/react";
 
 export function Navbar() {
     const pathname = usePathname();
-    const router = useRouter();
+    const { data: session } = useSession();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    const navItems = [
-        { href: "/", label: "الرئيسية" },
-        { href: "/lessons", label: "الدروس" },
-        { href: "/teachers", label: "المعلمون" },
-        { href: "/contact", label: "تواصل معنا" },
-    ];
+    const getNavItemsByRole = (role: string | null) => {
+        console.log("🚀 ~ getNavItemsByRole ~ role:", role);
+        switch (role) {
+            case "Teacher":
+                return [
+                    { href: "/students", label: "طلابي" },
+                    { href: "/my-lessons", label: "دروسي" },
+                    { href: "/contact", label: "تواصل معنا" },
+                ];
+            case "Student":
+                return [
+                    { href: "/lessons", label: "الدروس" },
+                    { href: "/teachers", label: "المعلمون" },
+                    { href: "/contact", label: "تواصل معنا" },
+                ];
+            case "Parent":
+                return [
+                    { href: "/children-progress", label: "تقدم الأبناء" },
+                    { href: "/contact", label: "تواصل معنا" },
+                ];
+            default:
+                return [
+                    { href: "/teachers", label: "المعلمون" },
+                    { href: "/contact", label: "تواصل معنا" },
+                ];
+        }
+    };
 
-    // useEffect(() => {
-    //     // Basic auth check via localStorage token set on login
-    //     try {
-    //         const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
-    //         setIsAuthenticated(Boolean(token));
-    //     } catch {}
-    // }, [pathname]);
+    const navItems = getNavItemsByRole(session?.user?.role || null);
 
-    function handleLogout() {
-        try {
-            localStorage.removeItem("auth_token");
-        } catch { }
-        setIsAuthenticated(false);
-        router.push("/");
-    }
+
+    const handleLogout = async () => {
+        await signOut({ callbackUrl: "/" });
+    };
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-orange-500 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
             <div className="container mx-auto px-4">
                 <div className="flex flex-row-reverse h-16 items-center justify-between">
 
-
                     {/* Action Buttons */}
                     <div className="flex items-center space-x-2">
                         {/* Desktop Auth Buttons */}
                         <div className="hidden lg:flex items-center space-x-2">
-                            {isAuthenticated ? (
-                                <>
-                                    <Button
-                                        variant="outline"
-                                        onClick={handleLogout}
-                                        className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
-                                    >
-                                        تسجيل الخروج
-                                    </Button>
-                                </>
-                            ) : (
-                                <>
-                                    {pathname.startsWith("/auth/login") ? (
-                                        <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
-                                            <Link href="/auth/register">إنشاء حساب</Link>
-                                        </Button>
-                                    ) : pathname.startsWith("/auth/register") ? (
-                                        <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
-                                            <Link href="/auth/login">تسجيل الدخول</Link>
-                                        </Button>
-                                    ) : (
-                                        <>
-                                            <Button
-                                                variant="outline"
-                                                asChild
-                                                className="border-orange-500 ms-4 text-orange-500 hover:bg-orange-500 hover:text-white"
-                                            >
-                                                <Link href="/auth/login">تسجيل الدخول</Link>
-                                            </Button>
-                                            <Button
-                                                asChild
-                                                className="bg-orange-500 hover:bg-orange-600 text-white"
-                                            >
-                                                <Link href="/auth/register">إنشاء حساب</Link>
-                                            </Button>
-                                        </>
-                                    )}
-                                </>
-                            )}
+                            <UserDropdown
+                                isAuthenticated={!!session}
+                                userEmail={session?.user?.email || null}
+                                userRole={session?.user?.role || null}
+                                onLogout={handleLogout}
+                            />
                         </div>
 
                         {/* Mobile Menu */}
@@ -112,8 +91,8 @@ export function Navbar() {
                                     key={navItem.href}
                                     href={navItem.href}
                                     className={`px-4 py-2 text-sm font-medium transition-all duration-200 rounded-md ${isActive
-                                            ? "bg-orange-500 text-white shadow-md font-semibold"
-                                            : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
+                                        ? "bg-orange-500 text-white shadow-md font-semibold"
+                                        : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
                                         }`}
                                 >
                                     {navItem.label}
@@ -142,8 +121,8 @@ export function Navbar() {
                                             href={navItem.href}
                                             onClick={() => setIsMobileMenuOpen(false)}
                                             className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
-                                                    ? "bg-orange-500 text-white shadow-sm"
-                                                    : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
+                                                ? "bg-orange-500 text-white shadow-sm"
+                                                : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
                                                 }`}
                                         >
                                             {navItem.label}
@@ -153,31 +132,13 @@ export function Navbar() {
 
                                 {/* Mobile Auth Buttons */}
                                 <div className="flex gap-2 pt-2 mt-2 border-t">
-                                    {isAuthenticated ? (
-                                        <Button
-                                            variant="outline"
-                                            onClick={handleLogout}
-                                            className="flex-1 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
-                                        >
-                                            تسجيل الخروج
-                                        </Button>
-                                    ) : (
-                                        <>
-                                            <Button
-                                                asChild
-                                                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
-                                            >
-                                                <Link href="/auth/register">إنشاء حساب</Link>
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                asChild
-                                                className="flex-1 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
-                                            >
-                                                <Link href="/auth/login">تسجيل الدخول</Link>
-                                            </Button>
-                                        </>
-                                    )}
+                                    <UserDropdown
+                                        isAuthenticated={!!session}
+                                        userEmail={session?.user?.email || null}
+                                        userRole={session?.user?.role || null}
+                                        onLogout={handleLogout}
+                                        isMobile={true}
+                                    />
                                 </div>
                             </nav>
                         </div>

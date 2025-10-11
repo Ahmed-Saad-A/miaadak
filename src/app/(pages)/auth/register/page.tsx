@@ -11,21 +11,21 @@ const RegisterPage = () => {
       description: "سجل كمعلم للوصول إلى لوحة التحكم التعليمية",
       href: "/auth/register/teacher",
       icon: "👨‍🏫",
-      color: "from-blue-500 to-blue-600"
+      color: "from-[#ff751f] to-[#da9752]"
     },
     {
       title: "تسجيل الطالب",
       description: "سجل كطالب للوصول إلى المحتوى التعليمي",
       href: "/auth/register/student",
       icon: "👨‍🎓",
-      color: "from-green-500 to-green-600"
+      color: "from-[#fed59d] to-[#ff751f]"
     },
     {
       title: "تسجيل ولي الأمر",
       description: "سجل كولي أمر لمتابعة تقدم طفلك",
       href: "/auth/register/parent",
       icon: "👨‍👩‍👧‍👦",
-      color: "from-purple-500 to-purple-600"
+      color: "from-[#da9752] to-[#fed59d]"
     }
   ];
 
@@ -57,7 +57,7 @@ const RegisterPage = () => {
                     <Link href={type.href}>
                       <motion.div
                         className={`
-                          p-6 rounded-xl border-2 border-gray-200 hover:border-[#00FF9C] 
+                          p-6 rounded-xl border-2 border-gray-200 hover:border-[#ff751f] 
                           transition-all duration-300 cursor-pointer group
                           bg-gradient-to-r ${type.color} bg-opacity-5 hover:bg-opacity-10
                         `}
@@ -67,7 +67,7 @@ const RegisterPage = () => {
                         <div className="flex items-center space-x-4 rtl:space-x-reverse">
                           <div className="text-3xl">{type.icon}</div>
                           <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-[#00FF9C] transition-colors">
+                            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-[#ff751f] transition-colors">
                               {type.title}
                             </h3>
                             <p className="text-gray-600 text-sm mt-1">
@@ -75,7 +75,7 @@ const RegisterPage = () => {
                             </p>
                           </div>
                           <motion.div
-                            className="text-gray-400 group-hover:text-[#00FF9C] transition-colors"
+                            className="text-gray-400 group-hover:text-[#ff751f] transition-colors"
                             whileHover={{ x: 5 }}
                           >
                             ←
@@ -90,7 +90,7 @@ const RegisterPage = () => {
               <div className="mt-8 text-center">
                 <p className="text-gray-600 text-sm">
                   لديك حساب بالفعل؟{" "}
-                  <Link href="/auth/login" className="text-[#00FF9C] hover:underline font-medium">
+                  <Link href="/auth/login" className="text-[#ff751f] hover:underline font-medium">
                     تسجيل الدخول
                   </Link>
                 </p>

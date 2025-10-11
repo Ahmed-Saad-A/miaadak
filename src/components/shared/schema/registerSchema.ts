@@ -1,32 +1,34 @@
-import * as zod from "zod";
+import { z } from "zod";
+import { GENDER, USER_ROLES } from "@/interfaces";
 
-export const RegisterSchema = zod.object({
-    name: zod
-        .string()
-        .nonempty("Name is required")
-        .min(3, "Name must be at least 3 characters")
-        .max(20, "Name is too long"),
-
-    email: zod
-        .string()
-        .email("Please enter a valid email address")
-        .nonempty("Email is required")
-        .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'E-mail is invalid'),
-
-    password: zod
-        .string()
-        .nonempty("Password is required")
-        .min(8, "Password must be at least 8 characters")
-        .regex(/^[A-Z](?=.*[a-zA-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/, 'Password must contain at least one letter, one number and one special character'),
-
-    rePassword: zod.string().nonempty("Password is required"),
-    
-    phone: zod
-        .string()
-        .nonempty('Phone is required')
-        .regex(/^\+?[0-9]{8,15}$/, "Please enter a valid phone number"),
-    })
-    .refine((data) => data.password === data.rePassword, {
-    message: "Passwords do not match",
-    path: ["rePassword"],
+export const stepOneSchema = z.object({
+    firstName: z.string().nonempty("الاسم الأول مطلوب").min(3, "الاسم يجب ألا يقل عن 3 أحرف"),
+    lastName: z.string().nonempty("الاسم الأخير مطلوب").min(3, "الاسم الأخير يجب ألا يقل عن 3 أحرف"),
+    email: z.string().email("البريد الإلكتروني غير صالح"),
 });
+
+export const stepTwoSchema = z
+    .object({
+        password: z
+            .string()
+            .nonempty("الاسم الأول مطلوب")
+            .min(8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل")
+            .regex(/[A-Z]/, "يجب أن تحتوي على حرف كبير واحد على الأقل")
+            .regex(/[a-z]/, "يجب أن تحتوي على حرف صغير واحد على الأقل")
+            .regex(/[0-9]/, "يجب أن تحتوي على رقم واحد على الأقل")
+            .regex(/[@$!%*?&]/, "يجب أن تحتوي على رمز خاص واحد على الأقل"),
+        confirmPassword: z.string().min(1, "تأكيد كلمة المرور مطلوب"),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "كلمتا المرور غير متطابقتين",
+        path: ["confirmPassword"],
+    });
+
+export const stepThreeSchema = z.object({
+    phoneNumber: z
+        .string()
+        .nonempty("الاسم الأول مطلوب")
+        .regex(/^01[0-9]{9}$/, "رقم الهاتف غير صالح")
+        .min(11, "رقم الهاتف يجب أن يكون 11 رقمًا"),
+});
+
