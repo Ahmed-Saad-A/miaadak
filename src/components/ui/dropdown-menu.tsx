@@ -11,11 +11,7 @@ const DropdownMenu = React.forwardRef<
   }
 >(({ className, open, onOpenChange, children, ...props }, ref) => {
   return (
-    <div
-      ref={ref}
-      className={cn("relative", className)}
-      {...props}
-    >
+    <div ref={ref} className={cn("relative", className)} {...props}>
       {children}
     </div>
   )
@@ -29,18 +25,18 @@ const DropdownMenuTrigger = React.forwardRef<
   }
 >(({ className, children, asChild, ...props }, ref) => {
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
+    type ChildProps = React.HTMLAttributes<HTMLElement> & { className?: string }
+
+    const child = children as React.ReactElement<ChildProps>
+
+    return React.cloneElement(child, {
       ...props,
-      className: cn("outline-none", className),
-    } as any)
+      className: cn("outline-none", child.props.className, className),
+    })
   }
-  
+
   return (
-    <button
-      ref={ref}
-      className={cn("outline-none", className)}
-      {...props}
-    >
+    <button ref={ref} className={cn("outline-none", className)} {...props}>
       {children}
     </button>
   )
@@ -76,15 +72,20 @@ const DropdownMenuItem = React.forwardRef<
   }
 >(({ className, asChild, children, ...props }, ref) => {
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
+    type ChildProps = React.HTMLAttributes<HTMLElement> & { className?: string }
+
+    const child = children as React.ReactElement<ChildProps>
+
+    return React.cloneElement(child, {
       ...props,
       className: cn(
         "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-gray-100 focus:bg-gray-100",
+        child.props.className,
         className
       ),
-    } as any)
+    })
   }
-  
+
   return (
     <div
       ref={ref}
