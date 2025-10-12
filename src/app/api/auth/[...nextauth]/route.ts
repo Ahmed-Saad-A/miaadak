@@ -1,7 +1,8 @@
 import { servicesApi } from "@/services/api";
-import NextAuth from "next-auth";
+import NextAuth, { User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { jwtDecode } from "jwt-decode";
+import { JWT } from "next-auth/jwt";
 
 interface AuthToken {
     accessToken: string;
@@ -15,10 +16,28 @@ interface DecodedToken {
     "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string;
     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"?: string;
     email?: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
-// Map role numbers to role names
+interface ExtendedUser extends User {
+    accessToken?: string;
+    refreshToken?: string;
+    accessTokenExpires?: number;
+    refreshTokenExpires?: number;
+    role?: string;
+    roleNumber?: string;
+}
+
+interface ExtendedToken extends JWT {
+    accessToken?: string;
+    refreshToken?: string;
+    accessTokenExpires?: number;
+    refreshTokenExpires?: number;
+    role?: string;
+    roleNumber?: string;
+    error?: string;
+}
+
 const getRoleName = (roleNumber: string | number): string => {
     switch (String(roleNumber)) {
         case "1":
@@ -37,40 +56,34 @@ const handler = NextAuth({
         CredentialsProvider({
             name: "Credentials",
             credentials: {
-                email: {},
-                password: {},
+                email: { label: "Email", type: "text" },
+                password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) return null;
 
                 const res = await servicesApi.loginUser(credentials.email, credentials.password);
-                console.log("🚀 ~ authorize ~ res:", res)
 
                 if (res.success) {
                     try {
-                        // Decode JWT to get user role
                         const decoded: DecodedToken = jwtDecode(res.jwt);
-                        const roleFromToken = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-                        console.log("🚀 ~ authorize ~ roleFromToken:", roleFromToken);
-
-                        // If the role is already a name, use it, otherwise map number to name
+                        const roleFromToken =
+                            decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
                         const roleName = ["Teacher", "Student", "Parent"].includes(roleFromToken || "")
                             ? roleFromToken
                             : getRoleName(roleFromToken || "");
-                        console.log("🚀 ~ authorize ~ roleName:", roleName);
 
                         const email =
                             decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
                             decoded.email ||
                             credentials.email;
-                        console.log("🚀 ~ authorize ~ email:", email);
 
                         return {
                             id: credentials.email,
-                            email: email,
-                            name: email, // يمكنك إضافة اسم إذا متاح
+                            email,
+                            name: email,
                             role: roleName,
-                            roleNumber: roleFromToken,
+                            roleNumber: String(roleFromToken ?? ""),
                             accessToken: res.jwt,
                             refreshToken: res.refreshToken,
                             accessTokenExpires: new Date(res.jwtExpireDate).getTime(),
@@ -82,44 +95,60 @@ const handler = NextAuth({
                     }
                 }
 
-
                 return null;
             },
         }),
     ],
+
     pages: {
         signIn: "/auth/login",
     },
+
     callbacks: {
         async jwt({ token, user }) {
-            if (user) {
-                token.accessToken = user.accessToken;
-                token.refreshToken = user.refreshToken;
-                token.accessTokenExpires = user.accessTokenExpires;
-                token.refreshTokenExpires = user.refreshTokenExpires;
-                token.role = user.role;
-                token.roleNumber = user.roleNumber;
+            const extendedUser = user as ExtendedUser | undefined;
+            let extendedToken = token as ExtendedToken;
+
+            if (extendedUser) {
+                extendedToken = {
+                    ...extendedToken,
+                    accessToken: extendedUser.accessToken,
+                    refreshToken: extendedUser.refreshToken,
+                    accessTokenExpires: extendedUser.accessTokenExpires,
+                    refreshTokenExpires: extendedUser.refreshTokenExpires,
+                    role: extendedUser.role,
+                    roleNumber: extendedUser.roleNumber,
+                };
             }
 
-            if (Date.now() < token.accessTokenExpires) return token;
+            if (
+                extendedToken.accessTokenExpires &&
+                Date.now() < extendedToken.accessTokenExpires
+            ) {
+                return extendedToken;
+            }
 
-            return await refreshAccessToken(token as AuthToken);
+            const refreshed = await refreshAccessToken(extendedToken as Required<AuthToken>);
+            return refreshed as ExtendedToken;
         },
 
         async session({ session, token }) {
+            const extendedToken = token as ExtendedToken;
+
             session.user = {
                 ...session.user,
-                accessToken: token.accessToken,
-                refreshToken: token.refreshToken,
-                role: token.role,
-                roleNumber: token.roleNumber,
+                accessToken: extendedToken.accessToken,
+                refreshToken: extendedToken.refreshToken,
+                role: extendedToken.role,
+                roleNumber: extendedToken.roleNumber,
             };
+
             return session;
         },
     },
 });
 
-async function refreshAccessToken(token: AuthToken): Promise<AuthToken> {
+async function refreshAccessToken(token: Required<AuthToken>): Promise<AuthToken> {
     try {
         const res = await fetch("https://miaadak.runasp.net/api/v1/Account/RefreshToken", {
             method: "POST",
@@ -139,13 +168,14 @@ async function refreshAccessToken(token: AuthToken): Promise<AuthToken> {
             accessToken: data.data.jwtModel.jwt,
             accessTokenExpires: new Date(data.data.jwtModel.jwtExpireDate).getTime(),
             refreshToken: data.data.refreshJWTModel.refreshJWT ?? token.refreshToken,
-            refreshTokenExpires: new Date(data.data.refreshJWTModel.refreshExpireDate).getTime(),
+            refreshTokenExpires: new Date(
+                data.data.refreshJWTModel.refreshExpireDate
+            ).getTime(),
         };
     } catch (error) {
         console.error("Refresh token error:", error);
         return { ...token, error: "RefreshTokenError" };
     }
 }
-
 
 export { handler as GET, handler as POST };
