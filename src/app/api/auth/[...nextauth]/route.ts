@@ -52,6 +52,7 @@ const getRoleName = (roleNumber: string | number): string => {
 };
 
 const handler = NextAuth({
+    secret: process.env.NEXTAUTH_SECRET,
     providers: [
         CredentialsProvider({
             name: "Credentials",
