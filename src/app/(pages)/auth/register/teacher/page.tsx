@@ -1,6 +1,8 @@
 "use client";
 
-import { TeacherForm, AnimatedSide } from "@/components/shared";
+import { TeacherForm } from "@/components/shared";
+import teacher from "@/assets/teacher.png";
+import Image from "next/image";
 
 const TeacherRegistrationPage = () => {
   return (
@@ -11,10 +13,14 @@ const TeacherRegistrationPage = () => {
           <div className="order-2 lg:order-1">
             <TeacherForm />
           </div>
-          
+
           {/* Right side - Animated Side */}
           <div className="order-1 lg:order-2">
-            <AnimatedSide />
+            <Image
+              src={teacher}
+              alt="Teacher Illustration"
+              className="w-full h-auto object-contain"
+            />
           </div>
         </div>
       </div>

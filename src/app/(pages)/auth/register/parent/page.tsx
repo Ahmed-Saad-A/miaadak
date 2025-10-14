@@ -1,6 +1,8 @@
 "use client";
 
-import { ParentForm, AnimatedSide } from "@/components/shared";
+import { ParentForm } from "@/components/shared";
+import parent from "@/assets/parent.png";
+import Image from "next/image";
 
 const ParentRegistrationPage = () => {
   return (
@@ -11,10 +13,14 @@ const ParentRegistrationPage = () => {
           <div className="order-2 lg:order-1">
             <ParentForm />
           </div>
-          
+
           {/* Right side - Animated Side */}
           <div className="order-1 lg:order-2">
-            <AnimatedSide />
+            <Image
+              src={parent}
+              alt="Parent Illustration"
+              className="w-full h-auto object-contain"
+            />
           </div>
         </div>
       </div>
