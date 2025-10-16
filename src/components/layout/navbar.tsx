@@ -37,7 +37,7 @@ export function Navbar() {
                 ];
             default:
                 return [
-                    { href: "/teachers", label: "المعلمون" },
+                    { href: "/aboutUs", label: "من نحن" },
                     { href: "/contact", label: "تواصل معنا" },
                 ];
         }
