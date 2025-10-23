@@ -52,9 +52,6 @@ const ParentForm = () => {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        gender: formData.gender,
-        studentCode: formData.studentCode,
         // userRole is automatically injected by validateStep
       };
       if (!validateStep(step1Data, 1)) {
@@ -127,11 +124,10 @@ const ParentForm = () => {
             value={formData.firstName}
             onChange={(e) => handleInputChange("firstName", e.target.value)}
             onBlur={(e) => validateField("firstName", e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${
-              getFieldError("firstName") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("firstName")
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                 : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+              }`}
             placeholder="أدخل اسمك الأول"
           />
           {getFieldError("firstName") && (
@@ -148,11 +144,10 @@ const ParentForm = () => {
             value={formData.lastName}
             onChange={(e) => handleInputChange("lastName", e.target.value)}
             onBlur={(e) => validateField("lastName", e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${
-              getFieldError("lastName") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
+            className={`w-full px-4 py-3 rounded-xl outline-0 border transition-all duration-200 ${getFieldError("lastName")
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                 : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+              }`}
             placeholder="أدخل اسمك الأخير"
           />
           {getFieldError("lastName") && (
@@ -169,60 +164,14 @@ const ParentForm = () => {
             value={formData.email}
             onChange={(e) => handleInputChange("email", e.target.value)}
             onBlur={(e) => validateField("email", e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${
-              getFieldError("email") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
+            className={`w-full px-4 py-3 rounded-xl outline-0 border transition-all duration-200 ${getFieldError("email")
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                 : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+              }`}
             placeholder="أدخل بريدك الإلكتروني"
           />
           {getFieldError("email") && (
             <p className="text-red-500 text-sm mt-1">{getFieldError("email")}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            رقم الهاتف
-          </label>
-          <input
-            type="tel"
-            value={formData.phoneNumber}
-            onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-            onBlur={(e) => validateField("phoneNumber", e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${
-              getFieldError("phoneNumber") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
-            placeholder="أدخل رقم هاتفك"
-          />
-          {getFieldError("phoneNumber") && (
-            <p className="text-red-500 text-sm mt-1">{getFieldError("phoneNumber")}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            كود الطالب
-          </label>
-          <input
-            type="text"
-            value={formData.studentCode}
-            onChange={(e) => handleInputChange("studentCode", e.target.value)}
-            onBlur={(e) => validateField("studentCode", e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${
-              getFieldError("studentCode") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
-            placeholder="أدخل كود الطالب"
-          />
-          <p className="text-sm text-gray-500 mt-1">
-            يمكنك الحصول على كود الطالب من المدرسة
-          </p>
-          {getFieldError("studentCode") && (
-            <p className="text-red-500 text-sm mt-1">{getFieldError("studentCode")}</p>
           )}
         </div>
       </div>
@@ -251,11 +200,10 @@ const ParentForm = () => {
               value={formData.password}
               onChange={(e) => handleInputChange("password", e.target.value)}
               onBlur={(e) => validateField("password", e.target.value)}
-              className={`w-full pr-12 pl-4 py-3 rounded-xl border transition-all duration-200 ${
-                getFieldError("password") 
-                  ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
+              className={`w-full pr-4 pl-4 py-3 rounded-xl border outline-0 transition-all duration-200 ${getFieldError("password")
+                  ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                   : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-              }`}
+                }`}
               placeholder="أدخل كلمة المرور"
             />
             <button
@@ -282,11 +230,10 @@ const ParentForm = () => {
               value={formData.confirmPassword}
               onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
               onBlur={(e) => validateField("confirmPassword", e.target.value)}
-              className={`w-full pr-12 pl-4 py-3 rounded-xl border transition-all duration-200 ${
-                getFieldError("confirmPassword") 
-                  ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
+              className={`w-full pr-4 pl-4 py-3 rounded-xl outline-0 border transition-all duration-200 ${getFieldError("confirmPassword")
+                  ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                   : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-              }`}
+                }`}
               placeholder="أعد إدخال كلمة المرور"
             />
             <button
@@ -317,6 +264,49 @@ const ParentForm = () => {
       transition={{ duration: 0.3 }}
       className="space-y-6"
     >
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          رقم الهاتف
+        </label>
+        <input
+          type="tel"
+          value={formData.phoneNumber}
+          onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+          onBlur={(e) => validateField("phoneNumber", e.target.value)}
+          className={`w-full px-4 py-3 rounded-xl outline-0 border transition-all duration-200 ${getFieldError("phoneNumber")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+            }`}
+          placeholder="أدخل رقم هاتفك"
+        />
+        {getFieldError("phoneNumber") && (
+          <p className="text-red-500 text-sm mt-1">{getFieldError("phoneNumber")}</p>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          كود الطالب
+        </label>
+        <input
+          type="text"
+          value={formData.studentCode}
+          onChange={(e) => handleInputChange("studentCode", e.target.value)}
+          onBlur={(e) => validateField("studentCode", e.target.value)}
+          className={`w-full px-4 py-3 rounded-xl outline-0 border transition-all duration-200 ${getFieldError("studentCode")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+            }`}
+          placeholder="أدخل كود الطالب"
+        />
+        <p className="text-sm text-gray-500 mt-1">
+          يمكنك الحصول على كود الطالب من المدرسة
+        </p>
+        {getFieldError("studentCode") && (
+          <p className="text-red-500 text-sm mt-1">{getFieldError("studentCode")}</p>
+        )}
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           الجنس
@@ -381,11 +371,10 @@ const ParentForm = () => {
           <motion.button
             onClick={currentStep === 3 ? handleSubmit : nextStep}
             disabled={isLoading}
-            className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${
-              isLoading 
-                ? "bg-gray-400 cursor-not-allowed" 
+            className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${isLoading
+                ? "bg-gray-400 cursor-not-allowed"
                 : "bg-[#ff751f] hover:bg-[#da9752]"
-            } text-white`}
+              } text-white`}
             whileHover={!isLoading ? { scale: 1.05 } : {}}
             whileTap={!isLoading ? { scale: 0.95 } : {}}
           >

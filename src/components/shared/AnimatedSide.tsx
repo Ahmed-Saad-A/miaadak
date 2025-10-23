@@ -6,7 +6,7 @@ import student from "@/assets/student.png";
 
 const AnimatedSide = () => {
     return (
-        <div className="relative flex justify-center items-center w-full">
+        <div className="relative flex justify-start items-start w-full">
             {/* الدواير الخلفية المتحركة */}
             <motion.div
                 className="absolute top-20 left-10 w-32 h-32 bg-orange-100 rounded-full"
@@ -28,7 +28,7 @@ const AnimatedSide = () => {
                 <Image
                     src={student}
                     alt="Student with Shape"
-                    className="w-72 md:w-96 object-contain drop-shadow-xl relative z-10"
+                    className="w-72 md:w-full object-contain drop-shadow-xl relative z-10"
                 />
             </motion.div>
         </div>

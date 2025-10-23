@@ -129,7 +129,7 @@ const TeacherForm = () => {
             value={formData.firstName}
             onChange={(e) => handleInputChange("firstName", e.target.value)}
             onBlur={(e) => validateField("firstName", e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${getFieldError("firstName")
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("firstName")
               ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
               : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
               }`}
@@ -149,7 +149,7 @@ const TeacherForm = () => {
             value={formData.lastName}
             onChange={(e) => handleInputChange("lastName", e.target.value)}
             onBlur={(e) => validateField("lastName", e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${getFieldError("lastName")
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("lastName")
               ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
               : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
               }`}
@@ -169,7 +169,7 @@ const TeacherForm = () => {
             value={formData.email}
             onChange={(e) => handleInputChange("email", e.target.value)}
             onBlur={(e) => validateField("email", e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${getFieldError("email")
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("email")
               ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
               : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
               }`}
@@ -205,7 +205,7 @@ const TeacherForm = () => {
               value={formData.password}
               onChange={(e) => handleInputChange("password", e.target.value)}
               onBlur={(e) => validateField("password", e.target.value)}
-              className={`w-full pr-4 pl-4 py-3 rounded-xl border transition-all duration-200 ${getFieldError("password")
+              className={`w-full pr-4 pl-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("password")
                 ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                 : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
                 }`}
@@ -235,7 +235,7 @@ const TeacherForm = () => {
               value={formData.confirmPassword}
               onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
               onBlur={(e) => validateField("confirmPassword", e.target.value)}
-              className={`w-full pr-4 pl-4 py-3 rounded-xl border transition-all duration-200 ${getFieldError("confirmPassword")
+              className={`w-full pr-4 pl-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("confirmPassword")
                 ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                 : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
                 }`}
@@ -279,7 +279,7 @@ const TeacherForm = () => {
             value={formData.phoneNumber}
             onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
             onBlur={(e) => validateField("phoneNumber", e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${getFieldError("phoneNumber")
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("phoneNumber")
               ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
               : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
               }`}
@@ -326,7 +326,7 @@ const TeacherForm = () => {
             value={formData.specialization}
             onChange={(e) => handleInputChange("specialization", e.target.value)}
             onBlur={(e) => validateField("specialization", e.target.value)}
-            className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${getFieldError("specialization")
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("specialization")
               ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
               : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
               }`}
