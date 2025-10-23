@@ -16,11 +16,10 @@ const ConfirmEmailPage = () => {
     const searchParams = useSearchParams();
     const email = searchParams.get("email") || "";
 
-    const [timeLeft, setTimeLeft] = useState(120); // 2 minutes in seconds
+    const [timeLeft, setTimeLeft] = useState(120);
     const [isResendEnabled, setIsResendEnabled] = useState(false);
     const [isResending, setIsResending] = useState(false);
 
-    // Countdown timer
     useEffect(() => {
         if (timeLeft > 0) {
             const timer = setTimeout(() => {
@@ -49,7 +48,7 @@ const ConfirmEmailPage = () => {
 
             if (response.isSucceeded) {
                 toast.success("تم إعادة إرسال رمز التحقق بنجاح", { id: "resend-code" });
-                setTimeLeft(120); // Reset timer to 2 minutes
+                setTimeLeft(120);
                 setIsResendEnabled(false);
             } else {
                 toast.error(response.message || "فشل في إعادة إرسال رمز التحقق", { id: "resend-code" });
