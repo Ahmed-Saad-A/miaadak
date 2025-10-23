@@ -31,7 +31,9 @@ const LoginPage = () => {
         toast.dismiss("login");
 
         if (result?.status === 401) {
-            toast.error("خطأ في البريد الإلكتروني أو كلمة المرور");
+            toast.error("يجب تأكيد البريد الإلكتروني قبل تسجيل الدخول.");
+            router.push(`/auth/register/confirm-email?email=${encodeURIComponent(email)}`);
+
         }
         else if (result?.status === 403) {
             toast.error("حساب غير مفعل. يرجى التحقق من بريدك الإلكتروني.");
