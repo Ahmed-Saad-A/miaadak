@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { servicesApi } from '@/services/api';
-import { UserRegistration, USER_ROLES } from '@/interfaces';
+import { UserRegistration } from '@/interfaces';
 import { stepOneSchema, stepTwoSchema, stepThreeSchema } from '@/components/shared/schema/registerSchema';
 import { ZodError, ZodSchema } from 'zod';
 
@@ -65,7 +65,7 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
         }
     };
 
-    // ✅ Real-time single-field validation
+    //  Real-time single-field validation
     const validateField = (fieldName: string, value: string | number) => {
         try {
             const allSchemas = [stepOneSchema, stepTwoSchema, stepThreeSchema];
@@ -93,7 +93,7 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
         }
     };
 
-    // ✅ Submit the full form (only after all steps pass)
+    //  Submit the full form (only after all steps pass)
     const registerUser = async (formData: Partial<UserRegistration>) => {
         setIsLoading(true);
         setErrors({});
@@ -137,7 +137,7 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
         }
     };
 
-    // ✅ Utility functions
+    // Utility functions
     const clearErrors = () => setErrors({});
     const clearFieldError = (fieldName: string) => {
         setErrors((prev) => {

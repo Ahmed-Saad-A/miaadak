@@ -1,12 +1,16 @@
 "use client";
 import React, { useState } from "react";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Mail, Loader2, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AnimatedSide } from "@/components/shared";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { useUserStore } from "@/store/userStore";
+import { Role } from "@/interfaces/roles";
+import { roleRoutes } from "@/configuration/roles";
+import { SessionUser } from "@/interfaces";
 
 const LoginPage = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -14,36 +18,69 @@ const LoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
-
+    const { setUser } = useUserStore();
+    
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
         setIsLoading(true);
         toast.loading("جارٍ تسجيل الدخول...", { id: "login" });
 
-        const result = await signIn("credentials", {
-            redirect: false,
-            email,
-            password,
-        });
+        try {
+            const csrfResponse = await fetch("/api/auth/csrf");
+            const { csrfToken } = await csrfResponse.json();
 
-        setIsLoading(false);
-        toast.dismiss("login");
+            const result = await signIn("credentials", {
+                redirect: false,
+                email,
+                password,
+                csrfToken,
+            });
 
-        if (result?.status === 401) {
-            toast.error("يجب تأكيد البريد الإلكتروني قبل تسجيل الدخول.");
-            router.push(`/auth/register/confirm-email?email=${encodeURIComponent(email)}`);
+            setIsLoading(false);
+            toast.dismiss("login");
 
-        }
-        else if (result?.status === 403) {
-            toast.error("حساب غير مفعل. يرجى التحقق من بريدك الإلكتروني.");
-        }
+            if (!result) {
+                toast.error("حدث خطأ أثناء الاتصال بالخادم.");
+                return;
+            }
 
-        else {
-            toast.success("تم تسجيل الدخول بنجاح 🎉");
-            router.push("/");
+            switch (result.error) {
+                case "EmailNotConfirmed":
+                    toast.error("لم يتم تأكيد البريد الإلكتروني.");
+                    router.push(`/auth/register/confirm-email?email=${encodeURIComponent(email)}`);
+                    return;
+                case "InvalidCredentials":
+                    toast.error("البريد أو كلمة المرور غير صحيحة.");
+                    return;
+                default:
+                    if (result.error) {
+                        toast.error(result.error);
+                    } else if (result.ok) {
+                        toast.success("تم تسجيل الدخول بنجاح 🎉");
+
+                        const session = await getSession();
+                        const user = session?.user as SessionUser;
+
+                        setUser({
+                            id: user?.id?.toString() || "",
+                            name: user?.name || "",
+                            role: (user?.role || "").toLowerCase() as Role,
+                        });
+
+                        const defaultRoute = roleRoutes[(user?.role || "").toLowerCase() as Role]?.[0]?.path;
+                        router.push(defaultRoute);
+                    } else {
+                        toast.error("حدث خطأ أثناء تسجيل الدخول.");
+                    }
+            }
+        } catch (err) {
+            console.error("Login error:", err);
+            setIsLoading(false);
+            toast.dismiss("login");
+            toast.error("حدث خطأ غير متوقع. حاول مرة أخرى.");
         }
     };
+
 
     return (
         <main className="container min-h-screen grid grid-cols-1 md:grid-cols-2 items-center">
