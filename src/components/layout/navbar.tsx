@@ -9,56 +9,78 @@ import React, { useState } from "react";
 import Image from "next/image";
 import MainLogo from "@/assets/mainLogo.png";
 import { useSession, signOut } from "next-auth/react";
+import { useUserStore } from "@/store/userStore";
+import { roleNavigation } from "@/configuration/roleNavigation";
 
 export function Navbar() {
     const pathname = usePathname();
     const { data: session } = useSession();
+    const { user: zustandUser, logout: logoutZustand } = useUserStore();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+    // Get user from Zustand first, fallback to NextAuth session
+    const user = zustandUser || (session?.user ? {
+        id: session.user.id || "",
+        name: session.user.name || "",
+        role: (session.user.role?.toLowerCase() || null)
+    } : null);
+
     const getNavItemsByRole = (role: string | null) => {
-        console.log("🚀 ~ getNavItemsByRole ~ role:", role);
-        switch (role) {
-            case "Teacher":
-                return [
-                    { href: "/students", label: "طلابي" },
-                    { href: "/my-lessons", label: "دروسي" },
-                    { href: "/contact", label: "تواصل معنا" },
-                ];
-            case "Student":
-                return [
-                    { href: "/lessons", label: "الدروس" },
-                    { href: "/teachers", label: "المعلمون" },
-                    { href: "/contact", label: "تواصل معنا" },
-                ];
-            case "Parent":
-                return [
-                    { href: "/children-progress", label: "تقدم الأبناء" },
-                    { href: "/contact", label: "تواصل معنا" },
-                ];
-            default:
-                return [
-                    { href: "/aboutUs", label: "من نحن" },
-                    { href: "/contact", label: "تواصل معنا" },
-                ];
+        if (!role) {
+            return [
+                { href: "/aboutUs", label: "من نحن" },
+                { href: "/contact", label: "تواصل معنا" },
+            ];
         }
+
+        // Map NextAuth role names to our role keys
+        const roleMap: Record<string, string> = {
+            "teacher": "teacher",
+            "student": "student",
+            "parent": "parent",
+            "assistant": "assistant",
+            "admin": "admin",
+            "Teacher": "teacher",
+            "Student": "student",
+            "Parent": "parent",
+            "Assistant": "assistant",
+            "Admin": "admin",
+        };
+
+        const mappedRole = roleMap[role] || role.toLowerCase();
+
+        if (!roleNavigation[mappedRole as keyof typeof roleNavigation]) {
+            return [
+                { href: "/aboutUs", label: "من نحن" },
+                { href: "/contact", label: "تواصل معنا" },
+            ];
+        }
+
+        // Map NavigationItem[] to {href, label}[]
+        const navItems = roleNavigation[mappedRole as keyof typeof roleNavigation];
+        return navItems.map(item => ({
+            href: item.path,
+            label: item.name
+        }));
     };
 
-    const navItems = getNavItemsByRole(session?.user?.role || null);
+    const navItems = getNavItemsByRole(user?.role || null);
 
 
     const handleLogout = async () => {
+        // Logout from both NextAuth and Zustand
+        logoutZustand();
         await signOut({ callbackUrl: "/" });
     };
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-orange-500 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
-            <div className="container mx-auto px-4">
-                <div className="flex flex-row-reverse h-16 items-center justify-between">
-
+        <header className="fixed top-0 left-1/2 -translate-x-1/2 z-50 mt-2 w-[90%] rounded-full border border-t-0 border-orange-500 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-md">
+            <div className="px-6">
+                <div className="flex flex-row-reverse items-center justify-between gap-4 h-16">
                     {/* Action Buttons */}
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-2">
                         {/* Desktop Auth Buttons */}
-                        <div className="hidden lg:flex items-center space-x-2">
+                        <div className="hidden lg:flex items-center gap-2">
                             <UserDropdown
                                 isAuthenticated={!!session}
                                 userEmail={session?.user?.email || null}
@@ -82,8 +104,9 @@ export function Navbar() {
                             <span className="sr-only">قائمة</span>
                         </Button>
                     </div>
+
                     {/* Desktop Navigation */}
-                    <nav className="hidden lg:flex items-center space-x-8">
+                    <nav className="hidden lg:flex items-center gap-6 whitespace-nowrap">
                         {navItems.map((navItem) => {
                             const isActive = pathname === navItem.href;
                             return (
@@ -91,8 +114,8 @@ export function Navbar() {
                                     key={navItem.href}
                                     href={navItem.href}
                                     className={`px-4 py-2 text-sm font-medium transition-all duration-200 rounded-md ${isActive
-                                        ? "bg-orange-500 text-white shadow-md font-semibold"
-                                        : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
+                                            ? "bg-orange-500 text-white shadow-md font-semibold"
+                                            : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
                                         }`}
                                 >
                                     {navItem.label}
@@ -102,27 +125,26 @@ export function Navbar() {
                     </nav>
 
                     {/* Logo */}
-                    <Link href="/" className="flex items-center space-x-2">
-                        <Image src={MainLogo} alt="Logo" className="h-16 w-auto" />
+                    <Link href="/" className="flex items-center">
+                        <Image src={MainLogo} alt="Logo" className="h-14 w-auto" />
                     </Link>
                 </div>
 
                 {/* Mobile Navigation Menu */}
                 {isMobileMenuOpen && (
-                    <div className="lg:hidden absolute start-0 end-0 border-t bg-white shadow-lg">
-                        <div className="container mx-auto px-4 py-4">
+                    <div className="lg:hidden absolute left-0 right-0 mt-2 w-2xs bg-white shadow-lg rounded-2xl">
+                        <div className="px-4 py-4">
                             <nav className="flex flex-col space-y-2">
                                 {navItems.map((navItem) => {
                                     const isActive = pathname === navItem.href;
-
                                     return (
                                         <Link
                                             key={navItem.href}
                                             href={navItem.href}
                                             onClick={() => setIsMobileMenuOpen(false)}
                                             className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
-                                                ? "bg-orange-500 text-white shadow-sm"
-                                                : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
+                                                    ? "bg-orange-500 text-white shadow-sm"
+                                                    : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
                                                 }`}
                                         >
                                             {navItem.label}

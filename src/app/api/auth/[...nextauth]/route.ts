@@ -65,38 +65,52 @@ const handler = NextAuth({
 
                 const res = await servicesApi.loginUser(credentials.email, credentials.password);
 
-                if (res.success) {
-                    try {
-                        const decoded: DecodedToken = jwtDecode(res.jwt);
-                        const roleFromToken =
-                            decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-                        const roleName = ["Teacher", "Student", "Parent"].includes(roleFromToken || "")
-                            ? roleFromToken
-                            : getRoleName(roleFromToken || "");
-
-                        const email =
-                            decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
-                            decoded.email ||
-                            credentials.email;
-
-                        return {
-                            id: credentials.email,
-                            email,
-                            name: email,
-                            role: roleName,
-                            roleNumber: String(roleFromToken ?? ""),
-                            accessToken: res.jwt,
-                            refreshToken: res.refreshToken,
-                            accessTokenExpires: new Date(res.jwtExpireDate).getTime(),
-                            refreshTokenExpires: new Date(res.refreshExpireDate).getTime(),
-                        };
-                    } catch (error) {
-                        console.error("Error decoding JWT:", error);
-                        return null;
-                    }
+                if (!res.success && res.message?.includes("not been confirmed")) {
+                    throw new Error("EmailNotConfirmed");
                 }
 
-                return null;
+                if (!res.success && res.message?.includes("Incorrect email or password")) {
+                    throw new Error("InvalidCredentials");
+                }
+
+                if (!res.success) {
+                    console.error("Login failed:", res.message);
+                    return null;
+                }
+
+                try {
+                    if (!res.jwt || !res.refreshToken) {
+                        console.error("Missing JWT or refresh token in response");
+                        return null;
+                    }
+
+                    const decoded: DecodedToken = jwtDecode(res.jwt);
+                    const roleFromToken =
+                        decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                    const roleName = ["Teacher", "Student", "Parent"].includes(roleFromToken || "")
+                        ? roleFromToken
+                        : getRoleName(roleFromToken || "");
+
+                    const email =
+                        decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
+                        decoded.email ||
+                        credentials.email;
+
+                    return {
+                        id: credentials.email,
+                        email,
+                        name: email,
+                        role: roleName,
+                        roleNumber: String(roleFromToken ?? ""),
+                        accessToken: res.jwt,
+                        refreshToken: res.refreshToken,
+                        accessTokenExpires: new Date(res.jwtExpireDate!).getTime(),
+                        refreshTokenExpires: new Date(res.refreshExpireDate!).getTime(),
+                    };
+                } catch (error) {
+                    console.error("Error decoding JWT:", error);
+                    return null;
+                }
             },
         }),
     ],

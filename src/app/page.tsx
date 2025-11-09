@@ -9,8 +9,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="relative overflow-hidden h-dvh sm:min-h-screen bg-[#F3F5F7] w-full flex items-center justify-center">
-      {/* الدوائر المتحركة */}
+    <div className="relative overflow-hidden bg-[#F3F5F7] w-full flex items-center justify-center">
       <motion.div
         className="absolute z-1 top-24 left-16 w-32 h-32 bg-orange-100 rounded-full"
         animate={{ y: [0, 30, 0] }}
@@ -22,33 +21,32 @@ export default function Home() {
         transition={{ repeat: Infinity, duration: 8 }}
       />
 
-      <main className="relative w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 items-center px-6 py-12 md:py-0">
-        {/* Right Section */}
-        <div className="flex justify-center md:justify-star">
+      <main className="relative w-full max-w-6xl mt-16 sm:mt-0 lg:mt-0 md:mt-0 mx-auto grid grid-cols-1 md:grid-cols-2 md:items-center px-6 py-12 md:py-0 md:direction-ltr">
+
+        {/* Right Section (Animated Image) */}
+        <div className="flex justify-center md:justify-end items-center w-full h-auto md:h-full order-1 md:order-none">
           <AnimatedSide />
         </div>
 
-        {/* Left Section */}
-        <div className="flex flex-col mt-56 justify-start items-center md:items-start text-center md:text-right w-full min-h-[30vh] md:h-[100vh] md:mt-20">
-          {/* اللوجو */}
+        {/* Left Section (Content) */}
+        <div className="flex flex-col justify-center items-center md:items-start text-center order-2 md:text-right w-full h-auto md:h-[100vh]">
           <Image
             src={logo}
             alt="logo"
-            className="sm:w-full md:w-full object-contain drop-shadow-lg z-10"
+            className="w-48 sm:w-60 md:w-full object-contain drop-shadow-lg z-10 mb-6 md:mb-0"
           />
 
-          {/* النصوص - فوق اللوجو مباشرة */}
-          <div className="w-full text-center mt-16 md:right-0 md:translate-y-[-50%] z-20">
-            <h1 className="w-full text-center md:text-center text-3xl md:text-5xl font-extrabold text-blue-900 leading-tight mb-3 sm:mb-16">
+          <div className="w-full text-center md:text-right z-20">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-blue-900 leading-tight mb-4">
               أهلاً بك في <span className="text-orange-500">ميعادك</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-gray-700 md:mx-0 leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
               احجز دروسك بسهولة مع أفضل المعلمين في كل المراحل الدراسية
             </p>
 
-            {/* الأزرار */}
-            <div className="w-full flex flex-wrap justify-center md:justify-center gap-4 pt-6">
+            {/* buttons */}
+            <div className="flex flex-wrap justify-center md:justify-start gap-4">
               <Button className="bg-orange-500 text-white px-6 py-3 rounded-lg shadow hover:bg-orange-600 transition font-semibold">
                 <Link href="/auth/register" replace>إنشاء حساب</Link>
               </Button>
@@ -58,8 +56,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-
       </main>
 
     </div>
