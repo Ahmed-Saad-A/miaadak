@@ -33,8 +33,13 @@ const icons: Record<string, JSX.Element> = {
     Children: <Users size={20} />,
 };
 
-export default function Sidebar() {
-    const [isOpen, setIsOpen] = useState(false);
+interface SidebarProps {
+    isOpen: boolean;
+    setIsOpen: (v: boolean) => void;
+}
+
+export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
+    // const [isOpen, setIsOpen] = useState(false);
     const { user } = useUserStore();
     const routes = roleRoutes[user?.role as keyof typeof roleRoutes] || [];
 
