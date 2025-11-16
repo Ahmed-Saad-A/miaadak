@@ -46,3 +46,5 @@ export const useUserStore = create<UserState>()(
     }
   )
 );
+console.log("🚀 ~ useUserStore:", useUserStore)
+

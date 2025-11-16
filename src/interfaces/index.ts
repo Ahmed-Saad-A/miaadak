@@ -5,3 +5,4 @@ export * from './roles';
 export * from './constants';
 export * from './sessionUser';
 export * from './useRegistration';
+export * from './authToken';

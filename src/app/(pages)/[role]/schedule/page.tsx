@@ -4,7 +4,9 @@ import { useRoleProtection } from "@/middleware/roleProtection";
 
 const Schedule = () => {
   useRoleProtection();
-  return <div>Schedule</div>;
+  return <div>Schedule
+    <h1>Ahmed</h1>
+  </div>;
 };
 
 export default Schedule;

@@ -25,6 +25,25 @@ export function Navbar() {
         role: (session.user.role?.toLowerCase() || null)
     } : null);
 
+    
+        const getHomeRoute = () => {
+            if (!user?.role) return "/";
+            switch (user.role.toLowerCase()) {
+                case "teacher":
+                    return "/teacher/dashboard";
+                case "student":
+                    return "/student/dashboard";
+                case "parent":
+                    return "/parent/dashboard";
+                case "assistant":
+                    return "/assistant/dashboard";
+                case "admin":
+                    return "/admin/dashboard";
+                default:
+                    return "/";
+            }
+        };
+
     const getNavItemsByRole = (role: string | null) => {
         if (!role) {
             return [
@@ -74,7 +93,9 @@ export function Navbar() {
     };
 
     return (
-        <header className="fixed top-0 left-1/2 -translate-x-1/2 z-50 mt-2 w-[90%] rounded-full border border-t-0 border-orange-500 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-md">
+        // "fixed top-0 left-1/2 -translate-x-1/2 z-50 mt-2 w-[90%] rounded-full border border-t-0 border-orange-500 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-md"
+        
+        <header className="relative top-0  z-50 m-auto mt-2 w-[90%] rounded-full border border-t-0 border-orange-500 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-md">
             <div className="px-6">
                 <div className="flex flex-row-reverse items-center justify-between gap-4 h-16">
                     {/* Action Buttons */}
@@ -105,7 +126,7 @@ export function Navbar() {
                         </Button>
                     </div>
 
-                    {/* Desktop Navigation */}
+                    {/* Desktop Navigation
                     <nav className="hidden lg:flex items-center gap-6 whitespace-nowrap">
                         {navItems.map((navItem) => {
                             const isActive = pathname === navItem.href;
@@ -114,18 +135,18 @@ export function Navbar() {
                                     key={navItem.href}
                                     href={navItem.href}
                                     className={`px-4 py-2 text-sm font-medium transition-all duration-200 rounded-md ${isActive
-                                            ? "bg-orange-500 text-white shadow-md font-semibold"
-                                            : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
+                                        ? "bg-orange-500 text-white shadow-md font-semibold"
+                                        : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
                                         }`}
                                 >
                                     {navItem.label}
                                 </Link>
                             );
                         })}
-                    </nav>
+                    </nav> */}
 
                     {/* Logo */}
-                    <Link href="/" className="flex items-center">
+                    <Link href={getHomeRoute()} className="flex items-center">
                         <Image src={MainLogo} alt="Logo" className="h-14 w-auto" />
                     </Link>
                 </div>
@@ -143,8 +164,8 @@ export function Navbar() {
                                             href={navItem.href}
                                             onClick={() => setIsMobileMenuOpen(false)}
                                             className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${isActive
-                                                    ? "bg-orange-500 text-white shadow-sm"
-                                                    : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
+                                                ? "bg-orange-500 text-white shadow-sm"
+                                                : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
                                                 }`}
                                         >
                                             {navItem.label}
