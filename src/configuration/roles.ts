@@ -1,6 +1,6 @@
 export const roleRoutes = {
   teacher: [
-    { path: "/teacher", label: "لوحة القيادة", iconKey: "Dashboard" },
+    { path: "/teacher/dashboard", label: "لوحة القيادة", iconKey: "Dashboard" },
     { path: "/teacher/schedule", label: "الجدول", iconKey: "Schedule" },
     { path: "/teacher/students", label: "الطلاب", iconKey: "Students" },
     { path: "/teacher/attendance", label: "الغياب", iconKey: "Attendance" },
