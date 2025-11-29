@@ -23,7 +23,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
                 {/* Main content */}
                 <main
-                    className={`flex-1 transition-all duration-300 p-6 ${isSidebarOpen ? "mr-64" : "mr-0"
+                    className={`flex-1 transition-all duration-300 p-6 mr-10 ${isSidebarOpen ? "mr-52" : "mr-0"
                         }`}
                 >
                     {children}
