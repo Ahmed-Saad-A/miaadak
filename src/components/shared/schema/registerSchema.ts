@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { GENDER, USER_ROLES } from "@/interfaces";
 
 export const stepOneSchema = z.object({
     firstName: z.string().nonempty("الاسم الأول مطلوب").min(3, "الاسم يجب ألا يقل عن 3 أحرف"),
@@ -27,8 +26,36 @@ export const stepTwoSchema = z
 export const stepThreeSchema = z.object({
     phoneNumber: z
         .string()
-        .nonempty("الاسم الأول مطلوب")
+        .nonempty("رقم الهاتف مطلوب")
         .regex(/^01[0-9]{9}$/, "رقم الهاتف غير صالح")
         .min(11, "رقم الهاتف يجب أن يكون 11 رقمًا"),
+    gender: z.number().min(0).max(1, "الجنس مطلوب"),
+});
+
+export const stepFourSchema = z.object({
+    address: z.string().nonempty("العنوان مطلوب").min(3, "العنوان يجب ألا يقل عن 3 أحرف"),
+    birthDate: z.string().nonempty("تاريخ الميلاد مطلوب").refine((date) => {
+        const selectedDate = new Date(date);
+        const today = new Date();
+        return selectedDate < today;
+    }, "تاريخ الميلاد يجب أن يكون في الماضي"),
+});
+
+export const stepFiveTeacherSchema = z.object({
+    subjectId: z.array(z.number()).min(1, "يرجى اختيار مادة واحدة على الأقل"),
+    experienceYears: z.number().min(0, "سنوات الخبرة يجب ألا تكون أقل من 0"),
+});
+
+// الحفاظ على الاسم السابق للتوافق
+export const stepFiveSchema = stepFiveTeacherSchema;
+
+export const stepFiveStudentSchema = z.object({
+    parentPhone: z
+        .string()
+        .nonempty("رقم هاتف ولي الأمر مطلوب")
+        .regex(/^01[0-9]{9}$/, "رقم الهاتف غير صالح")
+        .min(11, "رقم الهاتف يجب أن يكون 11 رقمًا"),
+    levelId: z.number().min(1, "الصف الدراسي مطلوب").max(12, "الصف غير صالح"),
+    school: z.string().nonempty("اسم المدرسة مطلوب").min(2, "اسم المدرسة قصير جدًا"),
 });
 

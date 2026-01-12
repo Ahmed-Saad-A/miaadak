@@ -15,7 +15,7 @@ const TeacherRegistrationPage = () => {
           </div>
 
           {/* Right side - Animated Side */}
-          <div className="order-1 lg:order-2">
+          <div className="hidden sm:block order-1 lg:order-2">
             <Image
               src={teacher}
               alt="Teacher Illustration"

@@ -1,4 +1,4 @@
-import { servicesApi } from "@/services/api";
+import { servicesApi } from "@/services/authApi";
 import NextAuth, { User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { jwtDecode } from "jwt-decode";

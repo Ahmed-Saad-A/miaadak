@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { AnimatedSide } from "@/components/shared";
 import { Mail, ArrowLeft, CheckCircle, Loader2, EyeOff, Eye, Clock, RefreshCw } from "lucide-react";
-import { servicesApi } from "@/services/api";
+import { servicesApi } from "@/services/authApi";
 import toast from "react-hot-toast";
 
 const ForgotPasswordPage = () => {

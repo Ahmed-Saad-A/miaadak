@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { servicesApi } from '@/services/api';
-import { UserRegistration } from '@/interfaces';
-import { stepOneSchema, stepTwoSchema, stepThreeSchema } from '@/components/shared/schema/registerSchema';
+import { servicesApi } from '@/services/authApi';
+import { UserRegistration, USER_ROLES } from '@/interfaces';
+import { stepOneSchema, stepTwoSchema, stepThreeSchema, stepFourSchema, stepFiveTeacherSchema, stepFiveStudentSchema } from '@/components/shared/schema/registerSchema';
 import { ZodError, ZodSchema } from 'zod';
 
 interface UseRegistrationProps {
@@ -15,35 +15,36 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const router = useRouter();
 
+    const teacherSchemas = [
+        { schema: stepOneSchema, fields: ['firstName', 'lastName', 'email'] },
+        { schema: stepTwoSchema, fields: ['password', 'confirmPassword'] },
+        { schema: stepThreeSchema, fields: ['phoneNumber', 'gender'] },
+        { schema: stepFourSchema, fields: ['address', 'birthDate'] },
+        { schema: stepFiveTeacherSchema, fields: ['subjectId', 'experienceYears'] },
+    ];
+
+    const studentSchemas = [
+        { schema: stepOneSchema, fields: ['firstName', 'lastName', 'email'] },
+        { schema: stepTwoSchema, fields: ['password', 'confirmPassword'] },
+        { schema: stepThreeSchema, fields: ['phoneNumber', 'gender'] },
+        { schema: stepFourSchema, fields: ['address', 'birthDate'] },
+        { schema: stepFiveStudentSchema, fields: ['parentPhone', 'levelId', 'school'] },
+    ];
+
+    const roleSchemas = userRole === USER_ROLES.STUDENT ? studentSchemas : teacherSchemas;
+
     // Validate step-by-step using the right schema
     const validateStep = (stepData: Partial<UserRegistration>, step: number) => {
         try {
-            let schema;
-            let stepFields: string[] = [];
+            const current = roleSchemas[step - 1];
+            if (!current) return false;
 
-            switch (step) {
-                case 1:
-                    schema = stepOneSchema;
-                    stepFields = ['firstName', 'lastName', 'email'];
-                    break;
-                case 2:
-                    schema = stepTwoSchema;
-                    stepFields = ['password', 'confirmPassword'];
-                    break;
-                case 3:
-                    schema = stepThreeSchema;
-                    stepFields = ['phoneNumber', 'gender'];
-                    break;
-                default:
-                    return false;
-            }
-
-            schema.parse(stepData);
+            current.schema.parse(stepData);
 
             // Clear passed field errors
             setErrors((prev) => {
                 const newErrors = { ...prev };
-                stepFields.forEach((field) => {
+                current.fields.forEach((field) => {
                     delete newErrors[field];
                 });
                 return newErrors;
@@ -66,9 +67,9 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
     };
 
     //  Real-time single-field validation
-    const validateField = (fieldName: string, value: string | number) => {
+    const validateField = (fieldName: string, value: string | number | number[]) => {
         try {
-            const allSchemas = [stepOneSchema, stepTwoSchema, stepThreeSchema];
+            const allSchemas = roleSchemas.map((item) => item.schema);
             const fieldSchema =
                 allSchemas
                     .map((schema) => (schema.shape as Record<string, ZodSchema>)[fieldName])
@@ -103,12 +104,17 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
             const allValid =
                 validateStep(formData, 1) &&
                 validateStep(formData, 2) &&
-                validateStep(formData, 3);
+                validateStep(formData, 3) &&
+                validateStep(formData, 4) &&
+                validateStep(formData, 5);
 
             if (!allValid) {
                 toast.error('يرجى تصحيح الأخطاء في النموذج قبل الإرسال');
                 return;
             }
+
+            // Convert birthDate to ISO format if it exists
+            const birthDateISO = formData.birthDate ? new Date(formData.birthDate).toISOString() : '';
 
             const registrationData: UserRegistration = {
                 firstName: formData.firstName || '',
@@ -119,7 +125,25 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
                 phoneNumber: formData.phoneNumber || '',
                 gender: formData.gender ?? 0,
                 userRole: userRole,
+                address: formData.address || '',
+                birthDate: birthDateISO,
+                parentPhone: formData.parentPhone || '',
+                levelId: formData.levelId ?? undefined,
+                school: formData.school || '',
             };
+
+            if (userRole === USER_ROLES.TEACHER) {
+                // Handle subjectId - send as array if multiple, or single number if one
+                const subjectIds = Array.isArray(formData.subjectId)
+                    ? formData.subjectId
+                    : formData.subjectId
+                        ? [formData.subjectId]
+                        : [];
+                const subjectIdValue = subjectIds.length === 1 ? subjectIds[0] : subjectIds;
+
+                registrationData.subjectId = subjectIdValue;
+                registrationData.experienceYears = formData.experienceYears ?? 0;
+            }
 
             const response = await servicesApi.registerUser(registrationData);
 

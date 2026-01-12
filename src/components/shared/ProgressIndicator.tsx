@@ -10,42 +10,33 @@ interface ProgressIndicatorProps {
 const ProgressIndicator = ({ currentStep, totalSteps }: ProgressIndicatorProps) => {
   return (
     <div className="flex items-center justify-center mb-8">
-      <div className="flex items-center space-x-4 rtl:space-x-reverse">
+      <div className="flex items-center w-full max-w-full">
         {Array.from({ length: totalSteps }, (_, index) => {
           const stepNumber = index + 1;
           const isActive = stepNumber === currentStep;
           const isCompleted = stepNumber < currentStep;
-          
+
           return (
-            <div key={stepNumber} className="flex items-center">
-              {/* Step Circle */}
+            <div key={stepNumber} className="flex items-center flex-1">
               <motion.div
-                className={`
-                  w-12 h-12 rounded-full flex items-center justify-center text-sm font-semibold
-                  transition-all duration-300
-                  ${isActive 
-                    ? 'bg-[#ff751f] text-white shadow-lg shadow-[#ff751f]/30' 
-                    : isCompleted 
-                    ? 'bg-[#ff751f] text-white' 
-                    : 'bg-[#d6d6d6] text-gray-500'
-                  }
-                `}
-                animate={isActive ? { scale: [1, 1.1, 1] } : {}}
-                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                className={`w-12 h-12 shrink-0 rounded-full flex items-center justify-center text-sm font-semibold
+              ${isActive
+                    ? 'bg-[#ff751f] text-white shadow-lg shadow-[#ff751f]/30'
+                    : isCompleted
+                      ? 'bg-[#ff751f] text-white'
+                      : 'bg-[#d6d6d6] text-gray-500'
+                  }`}
               >
                 {stepNumber}
               </motion.div>
-              
-              {/* Connecting Line */}
+
               {stepNumber < totalSteps && (
                 <motion.div
-                  className="w-16 h-1 bg-gray-200 mx-2"
-                  initial={{ width: 0 }}
-                  animate={{ 
-                    width: isCompleted ? 64 : 0,
-                    backgroundColor: isCompleted ? '#ff751f' : '#d6d6d6'
-                  }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="flex-1 h-1 mx-2 rounded-full bg-gray-200"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: isCompleted ? 1 : 0 }}
+                  transition={{ duration: 0.4 }}
+                  style={{ transformOrigin: 'left' }}
                 />
               )}
             </div>
