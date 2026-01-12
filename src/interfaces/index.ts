@@ -6,3 +6,6 @@ export * from './constants';
 export * from './sessionUser';
 export * from './useRegistration';
 export * from './authToken';
+export * from './parent';
+export * from './teacher';
+export * from './student';

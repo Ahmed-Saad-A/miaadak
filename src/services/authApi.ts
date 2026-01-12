@@ -1,4 +1,4 @@
-import { UserRegistration, ApiResponse, AuthToken } from '@/interfaces';
+import { UserRegistration, ApiResponse, AuthToken, Subject, Levels } from '@/interfaces';
 
 export interface RegisterResponse extends ApiResponse<string> { endpoint?: "register" }
 
@@ -33,6 +33,23 @@ class ServicesApi {
         return (await response.json()) as RegisterResponse;
     }
 
+    // =========== Get All Subjects ===========
+    async getAllSubjects(): Promise<ApiResponse<Subject[]>> {
+        const response = await fetch(
+            `${this.#baseUrl}api/v1/Subject/GetAllSubjects`,
+            {
+                method: "GET",
+                headers: this.#getHeaders(),
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch subjects");
+        }
+
+        return (await response.json()) as ApiResponse<Subject[]>;
+    }
+
     // =========== Register Student ===========
     async registerStudent(data: UserRegistration): Promise<RegisterResponse> {
         const response = await fetch(`${this.#baseUrl}api/v1/Account/Register/Student`, {
@@ -46,6 +63,23 @@ class ServicesApi {
         }
 
         return (await response.json()) as RegisterResponse;
+    }
+
+    // =========== Get All Levels ===========
+    async getAllLevels(): Promise<ApiResponse<Levels[]>> {
+        const response = await fetch(
+            `${this.#baseUrl}api/v1/GradeLevel/GetAllGradeLevels`,
+            {
+                method: "GET",
+                headers: this.#getHeaders(),
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch levels");
+        }
+
+        return (await response.json()) as ApiResponse<Levels[]>;
     }
 
     // =========== Register Parent ===========

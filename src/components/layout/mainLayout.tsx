@@ -24,7 +24,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     <Navbar />
 
                     {/* Main content */}
-                    <main className="max-w-[95vw] bg-white flex-1 rounded-2xl transition-all duration-300 p-6 shadow-md mx-2 my-2">
+                    <main className="max-w-[95vw] bg-white flex-1 rounded-2xl transition-all duration-300 shadow-md mx-2 my-2">
                         {children}
                     </main>
                 </div>
