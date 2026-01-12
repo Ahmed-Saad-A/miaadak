@@ -7,6 +7,8 @@ import {
   ModuleRegistry,
   AllCommunityModule,
 } from "ag-grid-community";
+
+import { AG_GRID_ARABIC } from "@/utils/aggrid-arabic"; // ← إضافة الترجمة هنا
 import { useRoleProtection } from "@/middleware/roleProtection";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -69,7 +71,7 @@ const Dashboard = () => {
 
       {/* Table */}
       <div
-        className="ag-theme-quartz p-4 bg-red-200"
+        className="ag-theme-quartz w-full h-[450px]"
         style={{ height: 450, width: "100%" }}
         dir="rtl"
       >
@@ -81,6 +83,7 @@ const Dashboard = () => {
           pagination={true}
           paginationPageSize={10}
           enableRtl={true}
+          localeText={AG_GRID_ARABIC}
           rowSelection="single"
           rowClassRules={{
             "bg-blue-100": "node.selected",

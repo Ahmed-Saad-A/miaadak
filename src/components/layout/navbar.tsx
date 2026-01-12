@@ -94,8 +94,7 @@ export function Navbar() {
 
     return (
         // "fixed top-0 left-1/2 -translate-x-1/2 z-50 mt-2 w-[90%] rounded-full border border-t-0 border-orange-500 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-md"
-        
-        <header className="relative top-0  z-50 m-auto mt-2 w-[90%] rounded-full border border-t-0 border-orange-500 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-md">
+        <header className="my-2 mx-2 rounded-2xl max-w-[95vw] bg-white backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-md transition-all duration-300">
             <div className="px-6">
                 <div className="flex flex-row-reverse items-center justify-between gap-4 h-16">
                     {/* Action Buttons */}

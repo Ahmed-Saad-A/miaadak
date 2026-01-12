@@ -1,23 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import ProgressIndicator from "./ProgressIndicator";
 import { useRegistration } from "@/hooks";
-import { USER_ROLES, GENDER } from "@/interfaces";
+import { USER_ROLES, GENDER, StudentFormData, Levels } from "@/interfaces";
 import toast from "react-hot-toast";
+import { servicesApi } from "@/services/authApi";
 
-interface StudentFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-  confirmPassword: string;
-  gender: number;
-}
 
 const StudentForm = () => {
   const router = useRouter();
@@ -30,14 +22,44 @@ const StudentForm = () => {
     password: "",
     confirmPassword: "",
     gender: GENDER.MALE,
+    address: "",
+    birthDate: "",
+    parentPhone: "",
+    levelId: 0,
+    school: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { registerUser, isLoading, getFieldError, validateStep, validateField} = useRegistration({
+  const { registerUser, isLoading, getFieldError, validateStep, validateField } = useRegistration({
     userRole: USER_ROLES.STUDENT,
   });
+
+  const [levels, setLevels] = useState<Levels[]>([]);
+  const [isLevelsLoading, setIsLevelsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchLevels = async () => {
+      try {
+        setIsLevelsLoading(true);
+        const res = await servicesApi.getAllLevels();
+
+        if (res.isSucceeded) {
+          setLevels(res.data);
+        } else {
+          toast.error(res.message);
+        }
+      } catch {
+        toast.error("فشل تحميل الصفوف الدراسية");
+      } finally {
+        setIsLevelsLoading(false);
+      }
+    };
+
+    fetchLevels();
+  }, []);
+
 
   const handleInputChange = (field: keyof StudentFormData, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -50,8 +72,6 @@ const StudentForm = () => {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        phoneNumber: formData.phoneNumber,
-        gender: formData.gender,
         // userRole is automatically injected by validateStep
       };
       if (!validateStep(step1Data, 1)) {
@@ -68,9 +88,37 @@ const StudentForm = () => {
         toast.error("يرجى تصحيح الأخطاء قبل المتابعة");
         return;
       }
+    } else if (currentStep === 3) {
+      const step3Data = {
+        phoneNumber: formData.phoneNumber,
+        gender: formData.gender,
+      };
+      if (!validateStep(step3Data, 3)) {
+        toast.error("يرجى تصحيح الأخطاء قبل المتابعة");
+        return;
+      }
+    } else if (currentStep === 4) {
+      const step4Data = {
+        address: formData.address,
+        birthDate: formData.birthDate,
+      };
+      if (!validateStep(step4Data, 4)) {
+        toast.error("يرجى تصحيح الأخطاء قبل المتابعة");
+        return;
+      }
+    } else if (currentStep === 5) {
+      const step5Data = {
+        parentPhone: formData.parentPhone,
+        levelId: formData.levelId,
+        school: formData.school,
+      };
+      if (!validateStep(step5Data, 5)) {
+        toast.error("يرجى تصحيح الأخطاء قبل المتابعة");
+        return;
+      }
     }
 
-    if (currentStep < 3) {
+    if (currentStep < 5) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -85,6 +133,18 @@ const StudentForm = () => {
   };
 
   const handleSubmit = async () => {
+    const allValid =
+      validateStep({ firstName: formData.firstName, lastName: formData.lastName, email: formData.email }, 1) &&
+      validateStep({ password: formData.password, confirmPassword: formData.confirmPassword }, 2) &&
+      validateStep({ phoneNumber: formData.phoneNumber, gender: formData.gender }, 3) &&
+      validateStep({ address: formData.address, birthDate: formData.birthDate }, 4) &&
+      validateStep({ parentPhone: formData.parentPhone, levelId: formData.levelId, school: formData.school }, 5);
+
+    if (!allValid) {
+      toast.error("يرجى تصحيح الأخطاء قبل الإرسال");
+      return;
+    }
+
     await registerUser(formData);
   };
 
@@ -124,11 +184,10 @@ const StudentForm = () => {
             value={formData.firstName}
             onChange={(e) => handleInputChange("firstName", e.target.value)}
             onBlur={(e) => validateField("firstName", e.target.value)}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("firstName") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("firstName")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
             placeholder="أدخل اسمك الأول"
           />
           {getFieldError("firstName") && (
@@ -145,11 +204,10 @@ const StudentForm = () => {
             value={formData.lastName}
             onChange={(e) => handleInputChange("lastName", e.target.value)}
             onBlur={(e) => validateField("lastName", e.target.value)}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("lastName") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("lastName")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
             placeholder="أدخل اسمك الأخير"
           />
           {getFieldError("lastName") && (
@@ -166,11 +224,10 @@ const StudentForm = () => {
             value={formData.email}
             onChange={(e) => handleInputChange("email", e.target.value)}
             onBlur={(e) => validateField("email", e.target.value)}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("email") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("email")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
             placeholder="أدخل بريدك الإلكتروني"
           />
           {getFieldError("email") && (
@@ -203,11 +260,10 @@ const StudentForm = () => {
               value={formData.password}
               onChange={(e) => handleInputChange("password", e.target.value)}
               onBlur={(e) => validateField("password", e.target.value)}
-              className={`w-full pr-4 pl-4 py-3 rounded-xl outline-0 border transition-all duration-200 ${
-                getFieldError("password") 
-                  ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                  : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-              }`}
+              className={`w-full pr-4 pl-4 py-3 rounded-xl outline-0 border transition-all duration-200 ${getFieldError("password")
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+                }`}
               placeholder="أدخل كلمة المرور"
             />
             <button
@@ -234,11 +290,10 @@ const StudentForm = () => {
               value={formData.confirmPassword}
               onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
               onBlur={(e) => validateField("confirmPassword", e.target.value)}
-              className={`w-full pr-4 pl-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-                getFieldError("confirmPassword") 
-                  ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                  : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-              }`}
+              className={`w-full pr-4 pl-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("confirmPassword")
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+                }`}
               placeholder="أعد إدخال كلمة المرور"
             />
             <button
@@ -278,11 +333,11 @@ const StudentForm = () => {
             type="tel"
             value={formData.phoneNumber}
             onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("phoneNumber") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            onBlur={(e) => validateField("phoneNumber", e.target.value)}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("phoneNumber")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
             placeholder="أدخل رقم هاتفك"
           />
           {getFieldError("phoneNumber") && (
@@ -320,6 +375,151 @@ const StudentForm = () => {
     </motion.div>
   );
 
+  const renderStep4 = () => (
+    <motion.div
+      key="step4"
+      custom={1}
+      variants={stepVariants}
+      initial="enter"
+      animate="center"
+      exit="exit"
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            العنوان
+          </label>
+          <input
+            type="text"
+            value={formData.address}
+            onChange={(e) => handleInputChange("address", e.target.value)}
+            onBlur={(e) => validateField("address", e.target.value)}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("address")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
+            placeholder="أدخل عنوانك"
+          />
+          {getFieldError("address") && (
+            <p className="text-red-500 text-sm mt-1">{getFieldError("address")}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            تاريخ الميلاد
+          </label>
+          <input
+            type="date"
+            value={formData.birthDate}
+            onChange={(e) => handleInputChange("birthDate", e.target.value)}
+            onBlur={(e) => validateField("birthDate", e.target.value)}
+            max={new Date().toISOString().split('T')[0]}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("birthDate")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
+          />
+          {getFieldError("birthDate") && (
+            <p className="text-red-500 text-sm mt-1">{getFieldError("birthDate")}</p>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+
+  const renderStep5 = () => (
+    <motion.div
+      key="step5"
+      custom={1}
+      variants={stepVariants}
+      initial="enter"
+      animate="center"
+      exit="exit"
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            رقم هاتف ولي الأمر
+          </label>
+          <input
+            type="tel"
+            value={formData.parentPhone}
+            onChange={(e) => handleInputChange("parentPhone", e.target.value)}
+            onBlur={(e) => validateField("parentPhone", e.target.value)}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("parentPhone")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
+            placeholder="أدخل رقم هاتف ولي الأمر"
+          />
+          {getFieldError("parentPhone") && (
+            <p className="text-red-500 text-sm mt-1">{getFieldError("parentPhone")}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            الصف الدراسي
+          </label>
+
+          <select
+            value={formData.levelId}
+            onChange={(e) =>
+              handleInputChange("levelId", Number(e.target.value))
+            }
+            onBlur={(e) =>
+              validateField("levelId", Number(e.target.value))
+            }
+            disabled={isLevelsLoading}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("levelId")
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
+          >
+            <option value={0}>اختر الصف الدراسي</option>
+
+            {levels.map((level) => (
+              <option key={level.id} value={level.id}>
+                {level.name}
+              </option>
+            ))}
+          </select>
+
+          {getFieldError("levelId") && (
+            <p className="text-red-500 text-sm mt-1">
+              {getFieldError("levelId")}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            المدرسة
+          </label>
+          <input
+            type="text"
+            value={formData.school}
+            onChange={(e) => handleInputChange("school", e.target.value)}
+            onBlur={(e) => validateField("school", e.target.value)}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("school")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
+            placeholder="أدخل اسم المدرسة"
+          />
+          {getFieldError("school") && (
+            <p className="text-red-500 text-sm mt-1">{getFieldError("school")}</p>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+
   return (
     <div className="w-full max-w-md mx-auto">
       <motion.div
@@ -333,12 +533,14 @@ const StudentForm = () => {
           <p className="text-gray-600">أكمل البيانات التالية لإتمام التسجيل</p>
         </div>
 
-        <ProgressIndicator currentStep={currentStep} totalSteps={3} />
+        <ProgressIndicator currentStep={currentStep} totalSteps={5} />
 
         <AnimatePresence mode="wait">
           {currentStep === 1 && renderStep1()}
           {currentStep === 2 && renderStep2()}
           {currentStep === 3 && renderStep3()}
+          {currentStep === 4 && renderStep4()}
+          {currentStep === 5 && renderStep5()}
         </AnimatePresence>
 
         <div className="flex justify-between mt-8">
@@ -352,17 +554,16 @@ const StudentForm = () => {
           </motion.button>
 
           <motion.button
-            onClick={currentStep === 3 ? handleSubmit : nextStep}
+            onClick={currentStep === 5 ? handleSubmit : nextStep}
             disabled={isLoading}
-            className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${
-              isLoading 
-                ? "bg-gray-400 cursor-not-allowed" 
-                : "bg-[#ff751f] hover:bg-[#da9752]"
-            } text-white`}
+            className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${isLoading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-[#ff751f] hover:bg-[#da9752]"
+              } text-white`}
             whileHover={!isLoading ? { scale: 1.05 } : {}}
             whileTap={!isLoading ? { scale: 0.95 } : {}}
           >
-            {isLoading ? "جاري التسجيل..." : (currentStep === 3 ? "إنهاء التسجيل" : "التالي")}
+            {isLoading ? "جاري التسجيل..." : (currentStep === 5 ? "إنهاء التسجيل" : "التالي")}
           </motion.button>
         </div>
       </motion.div>

@@ -7,7 +7,7 @@ import { AnimatedSide } from "@/components/shared";
 import { Mail, ArrowLeft, Clock, RefreshCw, CheckCircle, Loader2 } from "lucide-react";
 import Image from "next/image";
 import mainLogo from '@/assets/mainLogo.png';
-import { servicesApi } from "@/services/api";
+import { servicesApi } from "@/services/authApi";
 import toast from "react-hot-toast";
 import Link from "next/link";
 
