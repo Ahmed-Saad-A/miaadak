@@ -6,22 +6,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import ProgressIndicator from "./ProgressIndicator";
 import { useRegistration } from "@/hooks";
-import { USER_ROLES, GENDER } from "@/interfaces";
+import { USER_ROLES, GENDER, ParentRegistrationData } from "@/interfaces";
 import toast from "react-hot-toast";
 
-interface ParentFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-  confirmPassword: string;
-  gender: number;
-  studentCode: string;
-}
+type ParentFormData = ParentRegistrationData;
 
 const ParentForm = () => {
   const router = useRouter();
+  const TOTAL_STEPS = 4;
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ParentFormData>({
     firstName: "",
@@ -31,7 +23,8 @@ const ParentForm = () => {
     password: "",
     confirmPassword: "",
     gender: GENDER.MALE,
-    studentCode: "",
+    address: "",
+    birthDate: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -68,9 +61,27 @@ const ParentForm = () => {
         toast.error("يرجى تصحيح الأخطاء قبل المتابعة");
         return;
       }
+    } else if (currentStep === 3) {
+      const step3Data = {
+        phoneNumber: formData.phoneNumber,
+        gender: formData.gender,
+      };
+      if (!validateStep(step3Data, 3)) {
+        toast.error("يرجى تصحيح الأخطاء قبل المتابعة");
+        return;
+      }
+    } else if (currentStep === 4) {
+      const step4Data = {
+        address: formData.address,
+        birthDate: formData.birthDate,
+      };
+      if (!validateStep(step4Data, 4)) {
+        toast.error("يرجى تصحيح الأخطاء قبل المتابعة");
+        return;
+      }
     }
 
-    if (currentStep < 3) {
+    if (currentStep < TOTAL_STEPS) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -85,6 +96,17 @@ const ParentForm = () => {
   };
 
   const handleSubmit = async () => {
+    const allValid =
+      validateStep({ firstName: formData.firstName, lastName: formData.lastName, email: formData.email }, 1) &&
+      validateStep({ password: formData.password, confirmPassword: formData.confirmPassword }, 2) &&
+      validateStep({ phoneNumber: formData.phoneNumber, gender: formData.gender }, 3) &&
+      validateStep({ address: formData.address, birthDate: formData.birthDate }, 4);
+
+    if (!allValid) {
+      toast.error("يرجى تصحيح الأخطاء قبل الإرسال");
+      return;
+    }
+
     await registerUser(formData);
   };
 
@@ -286,29 +308,6 @@ const ParentForm = () => {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          كود الطالب
-        </label>
-        <input
-          type="text"
-          value={formData.studentCode}
-          onChange={(e) => handleInputChange("studentCode", e.target.value)}
-          onBlur={(e) => validateField("studentCode", e.target.value)}
-          className={`w-full px-4 py-3 rounded-xl outline-0 border transition-all duration-200 ${getFieldError("studentCode")
-              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
-          placeholder="أدخل كود الطالب"
-        />
-        <p className="text-sm text-gray-500 mt-1">
-          يمكنك الحصول على كود الطالب من المدرسة
-        </p>
-        {getFieldError("studentCode") && (
-          <p className="text-red-500 text-sm mt-1">{getFieldError("studentCode")}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
           الجنس
         </label>
         <div className="grid grid-cols-2 gap-4">
@@ -337,6 +336,61 @@ const ParentForm = () => {
     </motion.div>
   );
 
+  const renderStep4 = () => (
+    <motion.div
+      key="step4"
+      custom={1}
+      variants={stepVariants}
+      initial="enter"
+      animate="center"
+      exit="exit"
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            العنوان
+          </label>
+          <input
+            type="text"
+            value={formData.address}
+            onChange={(e) => handleInputChange("address", e.target.value)}
+            onBlur={(e) => validateField("address", e.target.value)}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("address")
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
+            placeholder="أدخل عنوانك"
+          />
+          {getFieldError("address") && (
+            <p className="text-red-500 text-sm mt-1">{getFieldError("address")}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            تاريخ الميلاد
+          </label>
+          <input
+            type="date"
+            value={formData.birthDate}
+            onChange={(e) => handleInputChange("birthDate", e.target.value)}
+            onBlur={(e) => validateField("birthDate", e.target.value)}
+            max={new Date().toISOString().split("T")[0]}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("birthDate")
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
+          />
+          {getFieldError("birthDate") && (
+            <p className="text-red-500 text-sm mt-1">{getFieldError("birthDate")}</p>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+
   return (
     <div className="w-full max-w-md mx-auto">
       <motion.div
@@ -350,12 +404,13 @@ const ParentForm = () => {
           <p className="text-gray-600">أكمل البيانات التالية لإتمام التسجيل</p>
         </div>
 
-        <ProgressIndicator currentStep={currentStep} totalSteps={3} />
+        <ProgressIndicator currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
         <AnimatePresence mode="wait">
           {currentStep === 1 && renderStep1()}
           {currentStep === 2 && renderStep2()}
           {currentStep === 3 && renderStep3()}
+          {currentStep === 4 && renderStep4()}
         </AnimatePresence>
 
         <div className="flex justify-between mt-8">
@@ -369,7 +424,7 @@ const ParentForm = () => {
           </motion.button>
 
           <motion.button
-            onClick={currentStep === 3 ? handleSubmit : nextStep}
+            onClick={currentStep === TOTAL_STEPS ? handleSubmit : nextStep}
             disabled={isLoading}
             className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${isLoading
                 ? "bg-gray-400 cursor-not-allowed"
@@ -378,7 +433,7 @@ const ParentForm = () => {
             whileHover={!isLoading ? { scale: 1.05 } : {}}
             whileTap={!isLoading ? { scale: 0.95 } : {}}
           >
-            {isLoading ? "جاري التسجيل..." : (currentStep === 3 ? "إنهاء التسجيل" : "التالي")}
+            {isLoading ? "جاري التسجيل..." : (currentStep === TOTAL_STEPS ? "إنهاء التسجيل" : "التالي")}
           </motion.button>
         </div>
       </motion.div>

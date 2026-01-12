@@ -1,45 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import ProgressIndicator from "@/components/shared/ProgressIndicator";
 import { useRegistration } from "@/hooks";
-import { USER_ROLES, GENDER } from "@/interfaces";
+import { USER_ROLES, GENDER, Subject, TeacherFormData } from "@/interfaces";
 import toast from "react-hot-toast";
+import { servicesApi } from "@/services/authApi";
 
-interface TeacherFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  phoneNumber: string;
-  gender: number;
-  address: string;
-  birthDate: string;
-  subjectId: number[];
-  experienceYears: number;
-}
 
-const SUBJECTS = [
-  { id: 1, name: "الرياضيات" },
-  { id: 2, name: "العلوم" },
-  { id: 3, name: "اللغة العربية" },
-  { id: 4, name: "اللغة الانجليزية" },
-  { id: 5, name: "اللغة الإطالية" },
-  { id: 6, name: "اللغة الفرنسية" },
-  { id: 7, name: "التربية الدينيه" },
-  { id: 8, name: "التربية الفنية (الرسم)" },
-  { id: 9, name: "التربية الرياضية" },
-  { id: 10, name: "التاريخ" },
-  { id: 11, name: "الجغرافيا" },
-  { id: 12, name: "الحاسب الآلي" },
-  { id: 13, name: "الفيزياء" },
-  { id: 14, name: "الكيمياء" },
-  { id: 15, name: "الاحياء" },
-];
+
 
 const TeacherForm = () => {
   const router = useRouter();
@@ -64,6 +36,32 @@ const TeacherForm = () => {
   const { registerUser, isLoading, getFieldError, validateStep, validateField } = useRegistration({
     userRole: USER_ROLES.TEACHER,
   });
+
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [isSubjectsLoading, setIsSubjectsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        setIsSubjectsLoading(true);
+        const res = await servicesApi.getAllSubjects();
+
+        if (res.isSucceeded) {
+          setSubjects(res.data);
+        } else {
+          toast.error(res.message);
+        }
+      } catch {
+        toast.error("فشل تحميل المواد الدراسية");
+      } finally {
+        setIsSubjectsLoading(false);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
+
+
 
   const handleInputChange = (field: keyof TeacherFormData, value: string | number | number[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -134,7 +132,7 @@ const TeacherForm = () => {
 
 
   const handleSubmit = async () => {
-    const allStepsValid = 
+    const allStepsValid =
       validateStep({ firstName: formData.firstName, lastName: formData.lastName, email: formData.email }, 1) &&
       validateStep({ password: formData.password, confirmPassword: formData.confirmPassword }, 2) &&
       validateStep({ phoneNumber: formData.phoneNumber, gender: formData.gender }, 3) &&
@@ -153,7 +151,6 @@ const TeacherForm = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     } else {
-      // Navigate to main register page on first step
       router.push("/auth/register");
     }
   };
@@ -457,19 +454,26 @@ const TeacherForm = () => {
             المواد الدراسية
           </label>
           <div className="grid grid-cols-2 gap-3 max-h-64 overflow-y-auto p-2 border border-gray-200 rounded-xl">
-            {SUBJECTS.map((subject) => (
-              <div
-                key={subject.id}
-                onClick={() => handleSubjectToggle(subject.id)}
-                className={`cursor-pointer rounded-xl border-2 p-3 text-center text-sm font-medium transition-all duration-300 
-                  ${formData.subjectId.includes(subject.id)
-                    ? "border-[#ff751f] bg-[#ff751f]/10 text-[#ff751f] scale-105 shadow-sm"
-                    : "border-gray-300 hover:border-[#ff751f]/50 hover:bg-gray-50"
-                  }`}
-              >
-                {subject.name}
-              </div>
-            ))}
+            {isSubjectsLoading ? (
+              <p className="col-span-2 text-center text-sm text-gray-500">
+                جاري تحميل المواد...
+              </p>
+            ) : (
+              subjects.map((subject) => (
+                <div
+                  key={subject.id}
+                  onClick={() => handleSubjectToggle(subject.id)}
+                  className={`cursor-pointer rounded-xl border-2 p-3 text-center text-sm font-medium transition-all
+      ${formData.subjectId.includes(subject.id)
+                      ? "border-[#ff751f] bg-[#ff751f]/10 text-[#ff751f]"
+                      : "border-gray-300 hover:border-[#ff751f]/50"
+                    }`}
+                >
+                  {subject.name}
+                </div>
+              ))
+
+            )}
           </div>
           {formData.subjectId.length === 0 && (
             <p className="text-orange-500 text-sm mt-1">يرجى اختيار مادة واحدة على الأقل</p>
@@ -487,14 +491,30 @@ const TeacherForm = () => {
             type="number"
             min="0"
             value={formData.experienceYears}
-            onChange={(e) => handleInputChange("experienceYears", parseInt(e.target.value) || 0)}
-            onBlur={(e) => validateField("experienceYears", parseInt(e.target.value) || 0)}
+            onFocus={() => {
+              if (formData.experienceYears === 0) {
+                handleInputChange("experienceYears", "");
+              }
+            }}
+            onChange={(e) =>
+              handleInputChange(
+                "experienceYears",
+                e.target.value === "" ? "" : Number(e.target.value)
+              )
+            }
+            onBlur={(e) =>
+              validateField(
+                "experienceYears",
+                Number(e.target.value || 0)
+              )
+            }
             className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("experienceYears")
-              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
               }`}
             placeholder="أدخل سنوات الخبرة"
           />
+
           {getFieldError("experienceYears") && (
             <p className="text-red-500 text-sm mt-1">{getFieldError("experienceYears")}</p>
           )}

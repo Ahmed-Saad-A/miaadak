@@ -3,7 +3,14 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { servicesApi } from '@/services/authApi';
 import { UserRegistration, USER_ROLES } from '@/interfaces';
-import { stepOneSchema, stepTwoSchema, stepThreeSchema, stepFourSchema, stepFiveTeacherSchema, stepFiveStudentSchema } from '@/components/shared/schema/registerSchema';
+import {
+    stepOneSchema,
+    stepTwoSchema,
+    stepThreeSchema,
+    stepFourSchema,
+    stepFiveTeacherSchema,
+    stepFiveStudentSchema,
+} from '@/components/shared/schema/registerSchema';
 import { ZodError, ZodSchema } from 'zod';
 
 interface UseRegistrationProps {
@@ -31,7 +38,19 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
         { schema: stepFiveStudentSchema, fields: ['parentPhone', 'levelId', 'school'] },
     ];
 
-    const roleSchemas = userRole === USER_ROLES.STUDENT ? studentSchemas : teacherSchemas;
+    const parentSchemas = [
+        { schema: stepOneSchema, fields: ['firstName', 'lastName', 'email'] },
+        { schema: stepTwoSchema, fields: ['password', 'confirmPassword'] },
+        { schema: stepThreeSchema, fields: ['phoneNumber', 'gender'] },
+        { schema: stepFourSchema, fields: ['address', 'birthDate'] },
+    ];
+
+    const roleSchemas =
+        userRole === USER_ROLES.STUDENT
+            ? studentSchemas
+            : userRole === USER_ROLES.PARENT
+                ? parentSchemas
+                : teacherSchemas;
 
     // Validate step-by-step using the right schema
     const validateStep = (stepData: Partial<UserRegistration>, step: number) => {
@@ -101,12 +120,9 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
 
         try {
             // Validate all steps before submitting
-            const allValid =
-                validateStep(formData, 1) &&
-                validateStep(formData, 2) &&
-                validateStep(formData, 3) &&
-                validateStep(formData, 4) &&
-                validateStep(formData, 5);
+            const allValid = roleSchemas
+                .map((_, index) => validateStep(formData, index + 1))
+                .every((isValid) => isValid);
 
             if (!allValid) {
                 toast.error('يرجى تصحيح الأخطاء في النموذج قبل الإرسال');
@@ -127,9 +143,6 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
                 userRole: userRole,
                 address: formData.address || '',
                 birthDate: birthDateISO,
-                parentPhone: formData.parentPhone || '',
-                levelId: formData.levelId ?? undefined,
-                school: formData.school || '',
             };
 
             if (userRole === USER_ROLES.TEACHER) {
@@ -143,6 +156,10 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
 
                 registrationData.subjectId = subjectIdValue;
                 registrationData.experienceYears = formData.experienceYears ?? 0;
+            } else if (userRole === USER_ROLES.STUDENT) {
+                registrationData.parentPhone = formData.parentPhone || '';
+                registrationData.levelId = formData.levelId ?? undefined;
+                registrationData.school = formData.school || '';
             }
 
             const response = await servicesApi.registerUser(registrationData);

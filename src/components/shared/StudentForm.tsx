@@ -1,43 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import ProgressIndicator from "./ProgressIndicator";
 import { useRegistration } from "@/hooks";
-import { USER_ROLES, GENDER } from "@/interfaces";
+import { USER_ROLES, GENDER, StudentFormData, Levels } from "@/interfaces";
 import toast from "react-hot-toast";
+import { servicesApi } from "@/services/authApi";
 
-interface StudentFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-  confirmPassword: string;
-  gender: number;
-  address: string;
-  birthDate: string;
-  parentPhone: string;
-  levelId: number;
-  school: string;
-}
-
-const LEVELS = [
-  { id: 1, name: "الصف الأول الابتدائي" },
-  { id: 2, name: "الصف الثاني الابتدائي" },
-  { id: 3, name: "الصف الثالث الابتدائي" },
-  { id: 4, name: "الصف الرابع الابتدائي" },
-  { id: 5, name: "الصف الخامس الابتدائي" },
-  { id: 6, name: "الصف السادس الابتدائي" },
-  { id: 7, name: "الصف الأول الاعدادي" },
-  { id: 8, name: "الصف الثاني الاعدادي" },
-  { id: 9, name: "الصف الثالث الاعدادي" },
-  { id: 10, name: "الصف الأول الثانوي" },
-  { id: 11, name: "الصف الثاني الثانوي" },
-  { id: 12, name: "الصف الثالث الثانوي" },
-];
 
 const StudentForm = () => {
   const router = useRouter();
@@ -60,9 +32,34 @@ const StudentForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const { registerUser, isLoading, getFieldError, validateStep, validateField} = useRegistration({
+  const { registerUser, isLoading, getFieldError, validateStep, validateField } = useRegistration({
     userRole: USER_ROLES.STUDENT,
   });
+
+  const [levels, setLevels] = useState<Levels[]>([]);
+  const [isLevelsLoading, setIsLevelsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchLevels = async () => {
+      try {
+        setIsLevelsLoading(true);
+        const res = await servicesApi.getAllLevels();
+
+        if (res.isSucceeded) {
+          setLevels(res.data);
+        } else {
+          toast.error(res.message);
+        }
+      } catch {
+        toast.error("فشل تحميل الصفوف الدراسية");
+      } finally {
+        setIsLevelsLoading(false);
+      }
+    };
+
+    fetchLevels();
+  }, []);
+
 
   const handleInputChange = (field: keyof StudentFormData, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -187,11 +184,10 @@ const StudentForm = () => {
             value={formData.firstName}
             onChange={(e) => handleInputChange("firstName", e.target.value)}
             onBlur={(e) => validateField("firstName", e.target.value)}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("firstName") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("firstName")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
             placeholder="أدخل اسمك الأول"
           />
           {getFieldError("firstName") && (
@@ -208,11 +204,10 @@ const StudentForm = () => {
             value={formData.lastName}
             onChange={(e) => handleInputChange("lastName", e.target.value)}
             onBlur={(e) => validateField("lastName", e.target.value)}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("lastName") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("lastName")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
             placeholder="أدخل اسمك الأخير"
           />
           {getFieldError("lastName") && (
@@ -229,11 +224,10 @@ const StudentForm = () => {
             value={formData.email}
             onChange={(e) => handleInputChange("email", e.target.value)}
             onBlur={(e) => validateField("email", e.target.value)}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("email") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("email")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
             placeholder="أدخل بريدك الإلكتروني"
           />
           {getFieldError("email") && (
@@ -266,11 +260,10 @@ const StudentForm = () => {
               value={formData.password}
               onChange={(e) => handleInputChange("password", e.target.value)}
               onBlur={(e) => validateField("password", e.target.value)}
-              className={`w-full pr-4 pl-4 py-3 rounded-xl outline-0 border transition-all duration-200 ${
-                getFieldError("password") 
-                  ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                  : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-              }`}
+              className={`w-full pr-4 pl-4 py-3 rounded-xl outline-0 border transition-all duration-200 ${getFieldError("password")
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+                }`}
               placeholder="أدخل كلمة المرور"
             />
             <button
@@ -297,11 +290,10 @@ const StudentForm = () => {
               value={formData.confirmPassword}
               onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
               onBlur={(e) => validateField("confirmPassword", e.target.value)}
-              className={`w-full pr-4 pl-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-                getFieldError("confirmPassword") 
-                  ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                  : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-              }`}
+              className={`w-full pr-4 pl-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("confirmPassword")
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+                }`}
               placeholder="أعد إدخال كلمة المرور"
             />
             <button
@@ -342,11 +334,10 @@ const StudentForm = () => {
             value={formData.phoneNumber}
             onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
             onBlur={(e) => validateField("phoneNumber", e.target.value)}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("phoneNumber") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("phoneNumber")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
             placeholder="أدخل رقم هاتفك"
           />
           {getFieldError("phoneNumber") && (
@@ -405,11 +396,10 @@ const StudentForm = () => {
             value={formData.address}
             onChange={(e) => handleInputChange("address", e.target.value)}
             onBlur={(e) => validateField("address", e.target.value)}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("address") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("address")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
             placeholder="أدخل عنوانك"
           />
           {getFieldError("address") && (
@@ -427,11 +417,10 @@ const StudentForm = () => {
             onChange={(e) => handleInputChange("birthDate", e.target.value)}
             onBlur={(e) => validateField("birthDate", e.target.value)}
             max={new Date().toISOString().split('T')[0]}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("birthDate") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("birthDate")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
           />
           {getFieldError("birthDate") && (
             <p className="text-red-500 text-sm mt-1">{getFieldError("birthDate")}</p>
@@ -462,11 +451,10 @@ const StudentForm = () => {
             value={formData.parentPhone}
             onChange={(e) => handleInputChange("parentPhone", e.target.value)}
             onBlur={(e) => validateField("parentPhone", e.target.value)}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("parentPhone") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("parentPhone")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
             placeholder="أدخل رقم هاتف ولي الأمر"
           />
           {getFieldError("parentPhone") && (
@@ -478,23 +466,34 @@ const StudentForm = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             الصف الدراسي
           </label>
+
           <select
             value={formData.levelId}
-            onChange={(e) => handleInputChange("levelId", Number(e.target.value))}
-            onBlur={(e) => validateField("levelId", Number(e.target.value))}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("levelId") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
+            onChange={(e) =>
+              handleInputChange("levelId", Number(e.target.value))
+            }
+            onBlur={(e) =>
+              validateField("levelId", Number(e.target.value))
+            }
+            disabled={isLevelsLoading}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("levelId")
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                 : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+              }`}
           >
             <option value={0}>اختر الصف الدراسي</option>
-            {LEVELS.map(level => (
-              <option key={level.id} value={level.id}>{level.name}</option>
+
+            {levels.map((level) => (
+              <option key={level.id} value={level.id}>
+                {level.name}
+              </option>
             ))}
           </select>
+
           {getFieldError("levelId") && (
-            <p className="text-red-500 text-sm mt-1">{getFieldError("levelId")}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {getFieldError("levelId")}
+            </p>
           )}
         </div>
 
@@ -507,11 +506,10 @@ const StudentForm = () => {
             value={formData.school}
             onChange={(e) => handleInputChange("school", e.target.value)}
             onBlur={(e) => validateField("school", e.target.value)}
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${
-              getFieldError("school") 
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20" 
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-            }`}
+            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("school")
+              ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+              : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+              }`}
             placeholder="أدخل اسم المدرسة"
           />
           {getFieldError("school") && (
@@ -558,11 +556,10 @@ const StudentForm = () => {
           <motion.button
             onClick={currentStep === 5 ? handleSubmit : nextStep}
             disabled={isLoading}
-            className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${
-              isLoading 
-                ? "bg-gray-400 cursor-not-allowed" 
-                : "bg-[#ff751f] hover:bg-[#da9752]"
-            } text-white`}
+            className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${isLoading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-[#ff751f] hover:bg-[#da9752]"
+              } text-white`}
             whileHover={!isLoading ? { scale: 1.05 } : {}}
             whileTap={!isLoading ? { scale: 0.95 } : {}}
           >
