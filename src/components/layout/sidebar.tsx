@@ -14,6 +14,8 @@ import {
     UserCircle,
     ClipboardList,
     BarChart3,
+    ChevronRight,
+    ChevronLeft,
 } from "lucide-react";
 import Image from "next/image";
 import MainLogo from "@/assets/mainLogo.png";
@@ -45,13 +47,28 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
 
     if (!user) return null;
 
+    const toggleSidebar = () => {
+        setIsOpen(!isOpen);
+    };
+
     return (
         <aside
-            onMouseEnter={() => setIsOpen(true)}
-            onMouseLeave={() => setIsOpen(false)}
-            className={`fixed top-24 right-2 h-fit pb-10 my-auto mb-5 bg-orange-500 text-white transition-all duration-300 flex flex-col items-center py-6 shadow-lg ${isOpen ? "w-56 rounded-2xl" : "w-16 rounded-2xl"
+            className={`fixed top-2 right-2 h-[97vh] pb-10 my-auto mb-5 bg-orange-500 text-white transition-all duration-300 flex flex-col items-center py-6 shadow-lg ${isOpen ? "w-56 rounded-2xl" : "w-16 rounded-2xl"
                 }`}
         >
+            {/* Toggle Button */}
+            <button
+                onClick={toggleSidebar}
+                className={`absolute top-1/2 -translate-y-1/2 w-8 h-8 bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all duration-300 z-50 ${isOpen ? "left-0 -translate-x-1/2" : "left-1/2 -translate-x-1/2"}`}
+                aria-label={isOpen ? "إغلاق القائمة الجانبية" : "فتح القائمة الجانبية"}
+            >
+                {isOpen ? (
+                    <ChevronRight size={18} />
+                ) : (
+                    <ChevronLeft size={18} />
+                )}
+            </button>
+
             {/* Logo */}
             <div className="mb-8">
                 <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
