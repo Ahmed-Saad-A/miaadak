@@ -57,11 +57,11 @@ const features = [
 
 export default function FeaturesSection() {
     return (
-        <section className="bg-white py-24">
+        <section className="bg-white rounded-2xl p-2 md:p-12 pb-12 shadow-md">
             <div className="container mx-auto px-6">
                 {/* Header */}
                 <div className="mb-16 text-center">
-                    <span className="mb-4 inline-block rounded-full bg-orange-100 px-4 py-1 text-sm font-medium text-orange-600">
+                    <span className="inline-block rounded-full bg-orange-100 px-4 py-1 text-sm font-medium text-orange-600">
                         المميزات
                     </span>
                     <h2 className="mt-4 text-4xl font-extrabold text-gray-900">
@@ -82,16 +82,42 @@ export default function FeaturesSection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.4, delay: i * 0.05 }}
-                            className="rounded-2xl border bg-white p-6 text-right transition hover:-translate-y-1 hover:shadow-lg"
+                            className="
+                group
+                rounded-3xl
+                bg-white
+                p-8
+                text-right
+                shadow-xl
+                transition-all
+                hover:-translate-y-2
+                hover:shadow-2xl
+              "
                         >
-                            <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
-                                <feature.icon size={24} />
+                            {/* Icon */}
+                            <div className="
+                mb-5
+                inline-flex
+                h-14 w-14
+                items-center
+                justify-center
+                rounded-2xl
+                bg-orange-50
+                text-orange-600
+                transition
+                group-hover:scale-110
+                group-hover:bg-orange-100
+              ">
+                                <feature.icon size={26} />
                             </div>
 
                             <h3 className="mb-2 text-lg font-bold text-gray-900">
                                 {feature.title}
                             </h3>
-                            <p className="text-sm text-gray-600">{feature.desc}</p>
+
+                            <p className="text-sm leading-relaxed text-gray-600">
+                                {feature.desc}
+                            </p>
                         </motion.div>
                     ))}
                 </div>

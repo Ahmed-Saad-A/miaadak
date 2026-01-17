@@ -20,3 +20,14 @@ export interface Subject {
     name: string;
 };
 
+// =========== Package Interface ===========
+export interface Package {
+    id: number;
+    name: number;
+    monthlyPrice: number;
+    description: string;
+    maxSessionsPerMonth: number;
+    maxStudentsPerSession: number;
+    maxAssistantsPerTeacher: number;
+}
+
