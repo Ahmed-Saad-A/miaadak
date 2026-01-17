@@ -6,12 +6,12 @@ import { ArrowLeft, PlayCircle } from "lucide-react";
 
 export default function HeroSection() {
     return (
-        <section className="relative overflow-hidden bg-white">
+        <section className="relative overflow-hidden bg-white rounded-2xl shadow-md">
             {/* Soft background accents */}
             <div className="absolute -top-32 -left-32 h-96 w-96 rounded-full bg-orange-200/20 blur-3xl" />
             <div className="absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-amber-200/20 blur-3xl" />
 
-            <div className="container relative mx-auto grid min-h-[90vh] grid-cols-1 items-center gap-12 px-6 py-20 lg:grid-cols-2">
+            <div className="container relative mx-auto grid grid-cols-1 items-center gap-12 px-6 py-20 lg:grid-cols-2">
                 {/* TEXT */}
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}

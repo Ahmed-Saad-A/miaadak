@@ -1,50 +1,23 @@
+// src/store/userStore.ts
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import { Role } from "@/interfaces/roles";
 
-interface User {
+interface UserUI {
   id: string;
   name: string;
+  email: string;
   role: Role | null;
 }
 
 interface UserState {
-  user: User | null;
-  isAuthenticated: boolean;
-  isInitialized: boolean;
-  setUser: (user: User) => void;
-  setRole: (role: Role | null) => void;
-  logout: () => void;
+  user: UserUI | null;
+  setUser: (user: UserUI) => void;
+  clearUser: () => void;
 }
 
-export const useUserStore = create<UserState>()(
-  persist(
-    (set) => ({
-      user: null,
-      isAuthenticated: false,
-      isInitialized: false,
+export const useUserStore = create<UserState>((set) => ({
+  user: null,
 
-      setUser: (user) =>
-        set({ user, isAuthenticated: true, isInitialized: true }),
-
-      setRole: (role) =>
-        set((state) => ({
-          user: state.user ? { ...state.user, role } : null,
-          isInitialized: true,
-        })),
-
-      logout: () =>
-        set({ user: null, isAuthenticated: false, isInitialized: true }),
-    }),
-    {
-      name: "user-storage",
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.isInitialized = true;
-        }
-      },
-    }
-  )
-);
-console.log("🚀 ~ useUserStore:", useUserStore)
-
+  setUser: (user) => set({ user }),
+  clearUser: () => set({ user: null }),
+}));
