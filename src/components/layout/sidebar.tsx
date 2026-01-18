@@ -3,11 +3,12 @@
 
 import { JSX } from "react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { roleRoutes } from "@/configuration/roles";
 import type { Role } from "@/interfaces/roles";
 import { SessionUser } from "@/interfaces";
+import { UserDropdown } from "@/components/ui/user-dropdown";
 import {
     LayoutDashboard,
     CalendarDays,
@@ -22,6 +23,8 @@ import {
     ChevronLeft,
     Home,
     Info,
+    Menu,
+    X,
 } from "lucide-react";
 import Image from "next/image";
 import MainLogo from "@/assets/mainLogo.png";
@@ -56,63 +59,132 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     const { data: session } = useSession();
-    console.log("🚀 ~ Sidebar ~ session:", session)
     const pathname = usePathname();
 
     const user = session?.user as SessionUser | undefined;
-    console.log("🚀 ~ Sidebar ~ user:", user)
     const role = user?.role?.toLowerCase() as Role | undefined;
-    console.log("🚀 ~ Sidebar ~ role:", role)
-
     const routes = role && roleRoutes[role] ? roleRoutes[role] : guestNavigation;
-    console.log("🚀 ~ Sidebar ~ routes:", routes)
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
 
+    const handleLinkClick = () => {
+        // إغلاق السايدبار تلقائياً عند الاختيار في الشاشات الصغيرة
+        if (window.innerWidth < 1024) {
+            setIsOpen(false);
+        }
+    };
+
     return (
-        <aside
-            className={`fixed top-2 right-2 h-[97vh] pb-10 my-auto mb-5 bg-orange-500 text-white transition-all duration-300 flex flex-col items-center py-6 shadow-lg ${isOpen ? "w-56 rounded-2xl" : "w-16 rounded-2xl"
-                }`}
-        >
-            <button
-                onClick={toggleSidebar}
-                className={`absolute top-1/2 -translate-y-1/2 w-8 h-8 bg-orange-500 hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white transition-all duration-300 z-50 ${isOpen ? "left-0 -translate-x-1/2" : "left-1/2 -translate-x-1/2"
-                    }`}
-                aria-label={isOpen ? "إغلاق القائمة الجانبية" : "فتح القائمة الجانبية"}
-            >
-                {isOpen ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-            </button>
-
-            <div className="mb-8">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                    <Image src={MainLogo} alt="Logo" className="w-auto" />
+        <>
+            {/* Navbar للشاشات الصغيرة فقط */}
+            <nav className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-orange-500 text-white flex items-center justify-between px-4 shadow-lg z-40">
+                <button
+                    onClick={toggleSidebar}
+                    className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                    aria-label="فتح القائمة"
+                >
+                    <Menu size={24} />
+                </button>
+                <div className="flex items-center gap-2">
+                    <Image src={MainLogo} alt="Logo" className="w-8 h-8" />
                 </div>
-            </div>
-
-            <nav className="flex flex-col gap-4 w-full px-2">
-                {routes.map((item) => {
-                    // ✅ تحسين: يعتبر الصفحة active إذا pathname يبدأ بـ item.path
-                    // أو إذا pathname === item.path بالظبط
-                    const isActive = pathname === item.path ||
-                        (item.path !== "/" && pathname.startsWith(item.path));
-
-                    return (
-                        <Link
-                            key={item.path}
-                            href={item.path}
-                            className={`flex items-center gap-3 rounded-xl px-3 py-2 transition-all ${isActive
-                                    ? "bg-white text-orange-500 font-semibold shadow-md" // ✅ إضافة shadow
-                                    : "text-white hover:bg-white/20"
-                                }`}
-                        >
-                            {icons[item.iconKey] || <LayoutDashboard size={20} />}
-                            {isOpen && <span className="whitespace-nowrap">{item.label}</span>}
-                        </Link>
-                    );
-                })}
+                <div className="flex items-center">
+                    <UserDropdown
+                        isAuthenticated={!!user}
+                        userEmail={user?.email || null}
+                        userRole={user?.role || null}
+                        onLogout={() => signOut({ callbackUrl: "/" })}
+                    />
+                </div>
             </nav>
-        </aside>
+
+            {/* Overlay للشاشات الصغيرة */}
+            {isOpen && (
+                <div
+                    className="lg:hidden fixed inset-0 bg-black/50 z-40 mt-16"
+                    onClick={() => setIsOpen(false)}
+                />
+            )}
+
+            {/* Sidebar */}
+            <aside
+                className={`
+                    bg-orange-500 text-white transition-all duration-300 flex flex-col py-6 shadow-lg
+                    
+                    /* Desktop - Fixed positioned */
+                    lg:fixed lg:top-2 lg:right-2 lg:h-[97vh] lg:pb-4 lg:items-center
+                    ${isOpen ? "lg:w-56 lg:rounded-2xl" : "lg:w-16 lg:rounded-2xl"}
+                    
+                    /* Mobile & Tablet - Absolute positioned with full overlay */
+                    max-lg:fixed max-lg:top-16 max-lg:right-0 max-lg:h-[calc(100vh-4rem)] max-lg:w-64 max-lg:z-50
+                    ${isOpen ? "max-lg:translate-x-0" : "max-lg:translate-x-full"}
+                `}
+            >
+                {/* زر الإغلاق للشاشات الصغيرة */}
+                <button
+                    onClick={toggleSidebar}
+                    className="lg:hidden absolute top-4 left-4 p-2 hover:bg-white/20 rounded-lg transition-colors"
+                    aria-label="إغلاق القائمة"
+                >
+                    <X size={24} />
+                </button>
+
+                {/* زر Toggle للشاشات الكبيرة - في الأعلى */}
+                <button
+                    onClick={toggleSidebar}
+                    className={`
+                        hidden lg:flex
+                        absolute top-16 w-8 h-8 bg-orange-500 hover:bg-orange-600 text-white 
+                        rounded-full items-center justify-center shadow-lg border-2 border-white 
+                        transition-all duration-300
+                        ${isOpen ? "left-0 -translate-x-1/2" : "left-0 -translate-x-1/2"}
+                    `}
+                    aria-label={isOpen ? "إغلاق القائمة الجانبية" : "فتح القائمة الجانبية"}
+                >
+                    {isOpen ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+                </button>
+
+                {/* Logo - Desktop only */}
+                <div className="mb-8 hidden lg:block">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <Image src={MainLogo} alt="Logo" className="w-auto" />
+                    </div>
+                </div>
+
+                {/* Navigation Links */}
+                <nav className="flex flex-col gap-2 w-full px-2 flex-1 min-h-0">
+                    <div className="flex flex-col gap-2 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
+                        {routes.map((item) => {
+                            const isDashboard =
+                                item.path === `/${role}` && pathname === `/${role}`;
+
+                            const isActive =
+                                isDashboard ||
+                                (item.path !== `/${role}` && pathname.startsWith(item.path));
+
+
+                            return (
+                                <Link
+                                    key={item.path}
+                                    href={item.path}
+                                    onClick={handleLinkClick}
+                                    className={`flex items-center gap-3 rounded-xl px-3 py-2 transition-all flex-shrink-0 ${isActive
+                                        ? "bg-white text-orange-500 font-semibold shadow-md"
+                                        : "text-white hover:bg-white/20"
+                                        }`}
+                                >
+                                    {icons[item.iconKey] || <LayoutDashboard size={20} />}
+                                    <span className={`whitespace-nowrap ${isOpen ? "lg:block" : "lg:hidden"} max-lg:block`}>
+                                        {item.label}
+                                    </span>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </nav>
+            </aside>
+        </>
     );
 }

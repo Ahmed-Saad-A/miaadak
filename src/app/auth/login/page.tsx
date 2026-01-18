@@ -3,7 +3,7 @@
 
 import React, { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Mail, Loader2, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AnimatedSide } from "@/components/shared";
@@ -16,62 +16,54 @@ const LoginPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
-    const searchParams = useSearchParams();
-
-    // ✅ جلب الـ callbackUrl من الـ URL
-    const callbackUrl = searchParams.get("callbackUrl");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
-        try {
-            const result = await signIn("credentials", {
-                redirect: false,
-                email,
-                password,
-            });
+        const result = await signIn("credentials", {
+            redirect: false,
+            email,
+            password,
+        });
 
-            if (!result) {
-                toast.error("حدث خطأ أثناء الاتصال بالخادم.");
-                setIsLoading(false);
-                return;
-            }
-
-            if (result.error) {
-                switch (result.error) {
-                    case "EmailNotConfirmed":
-                        toast.error("لم يتم تأكيد البريد الإلكتروني.");
-                        router.push(
-                            `/auth/register/confirm-email?email=${encodeURIComponent(email)}`
-                        );
-                        break;
-                    case "InvalidCredentials":
-                        toast.error("البريد أو كلمة المرور غير صحيحة.");
-                        break;
-                    default:
-                        toast.error(result.error);
-                }
-                setIsLoading(false);
-                return;
-            }
-
-            // ✅ Success
-            toast.success("تم تسجيل الدخول بنجاح 🎉");
-
-            // لو فيه callbackUrl (جاي من middleware)
-            if (callbackUrl) {
-                router.replace(decodeURIComponent(callbackUrl));
-            } else {
-                router.replace("/");
-            }
-
-
-        } catch (err) {
-            console.error("Login error:", err);
-            toast.error("حدث خطأ غير متوقع. حاول مرة أخرى.");
+        if (result?.error) {
+            toast.error("البريد أو كلمة المرور غير صحيحة");
             setIsLoading(false);
+            return;
         }
+
+        toast.success("تم تسجيل الدخول بنجاح 🎉");
+
+        // ✅ جلب بيانات المستخدم بعد تسجيل الدخول
+        const response = await fetch("/api/auth/session");
+        const session = await response.json();
+        const role = session?.user?.role?.toLowerCase();
+
+        // ✅ التوجيه حسب الـ role
+        let redirectPath = "/";
+        switch (role) {
+            case "teacher":
+                redirectPath = "/teacher";
+                break;
+            case "student":
+                redirectPath = "/student";
+                break;
+            case "parent":
+                redirectPath = "/parent";
+                break;
+            case "assistant":
+                redirectPath = "/assistant";
+                break;
+            case "admin":
+                redirectPath = "/admin";
+                break;
+            default:
+                redirectPath = "/";
+        }
+
+        router.replace(redirectPath);
+        setIsLoading(false);
     };
 
     return (

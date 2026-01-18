@@ -13,9 +13,11 @@ export default function PagesLayout({ children }: { children: React.ReactNode })
 
     return (
         <div className="min-h-screen flex flex-col bg-[#f4f4f4]">
-            <div
-                className={`flex flex-1 flex-row-reverse relative transition-all duration-300 ${isSidebarOpen ? "mr-[15rem]" : "mr-20"
-                    }`}
+            {/* Desktop Layout */}
+            <div className="hidden lg:flex flex-1 flex-row-reverse relative transition-all duration-300"
+                style={{
+                    marginRight: isSidebarOpen ? "15rem" : "5rem"
+                }}
             >
                 <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
@@ -29,6 +31,16 @@ export default function PagesLayout({ children }: { children: React.ReactNode })
                         {children}
                     </main>
                 </div>
+            </div>
+
+            {/* Mobile & Tablet Layout */}
+            <div className="lg:hidden flex flex-col flex-1 pt-16">
+                <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+
+                {/* Main content - Full width on mobile */}
+                <main className="bg-white flex-1 m-2 rounded-2xl">
+                    {children}
+                </main>
             </div>
         </div>
     );
