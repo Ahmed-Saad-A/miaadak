@@ -1,50 +1,60 @@
 // src/middleware.ts
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
-import type { Role } from "@/interfaces/roles";
-import { roleRoutes } from "@/configuration/roles";
 
 export default withAuth(
   function middleware(req) {
     const { pathname } = req.nextUrl;
-    const token = req.nextauth.token;
+    const role = req.nextauth.token?.role?.toLowerCase();
 
-    const role = (token?.role as string)?.toLowerCase() as Role;
+    // ✅ إذا المستخدم مسجل دخول ودخل على الصفحة الرئيسية، وجهه لصفحة الـ role
+    if (pathname === "/" && role) {
+      const roleRedirects: Record<string, string> = {
+        teacher: "/teacher",
+        student: "/student",
+        parent: "/parent",
+        assistant: "/assistant",
+        admin: "/admin",
+      };
 
-    // 🔁 لو مسجل دخول وداخل auth pages
-    if (pathname.startsWith("/auth")) {
-      const defaultRoute = roleRoutes[role]?.[0]?.path || "/teacher/dashboard";
-      return NextResponse.redirect(new URL(defaultRoute, req.url));
-    }
-
-    // 🔐 Role protection
-    if (pathname.startsWith("/teacher")) {
-      if (role !== "teacher") {
-        return NextResponse.redirect(
-          new URL(roleRoutes[role]?.[0]?.path || "/", req.url)
-        );
+      const redirectPath = roleRedirects[role];
+      if (redirectPath) {
+        return NextResponse.redirect(new URL(redirectPath, req.url));
       }
     }
+
+    // ✅ منع الوصول للصفحات غير المصرح بها
+    if (pathname.startsWith("/teacher") && role !== "teacher")
+      return NextResponse.redirect(new URL("/", req.url));
+
+    if (pathname.startsWith("/student") && role !== "student")
+      return NextResponse.redirect(new URL("/", req.url));
+
+    if (pathname.startsWith("/parent") && role !== "parent")
+      return NextResponse.redirect(new URL("/", req.url));
+
+    if (pathname.startsWith("/assistant") && role !== "assistant")
+      return NextResponse.redirect(new URL("/", req.url));
+
+    if (pathname.startsWith("/admin") && role !== "admin")
+      return NextResponse.redirect(new URL("/", req.url));
 
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => {
-        // 👈 ده المهم
-        return !!token;
-      },
+      authorized: () => true,
     },
   }
 );
 
 export const config = {
   matcher: [
+    "/",
     "/teacher/:path*",
     "/student/:path*",
     "/parent/:path*",
     "/assistant/:path*",
     "/admin/:path*",
-    "/auth/:path*",
   ],
 };
