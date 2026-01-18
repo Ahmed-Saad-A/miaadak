@@ -1,3 +1,4 @@
+// src/app/api/auth/[...nextauth]/route.ts
 import { servicesApi } from "@/services/authApi";
 import NextAuth, { User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -61,24 +62,22 @@ const handler = NextAuth({
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) return null;
-
-                const res = await servicesApi.loginUser(credentials.email, credentials.password);
-
-                if (!res.success && res.message?.includes("not been confirmed")) {
-                    throw new Error("EmailNotConfirmed");
-                }
-
-                if (!res.success && res.message?.includes("Incorrect email or password")) {
-                    throw new Error("InvalidCredentials");
-                }
-
-                if (!res.success) {
-                    console.error("Login failed:", res.message);
+                if (!credentials?.email || !credentials?.password) {
                     return null;
                 }
 
                 try {
+                    const res = await servicesApi.loginUser(credentials.email, credentials.password);
+
+                    console.log("API Response:", res); // للتشخيص
+
+                    // ✅ إذا فشل تسجيل الدخول لأي سبب، نرجع null
+                    if (!res.success) {
+                        console.error("Login failed:", res.message);
+                        return null;
+                    }
+
+                    // ✅ التحقق من وجود الـ tokens
                     if (!res.jwt || !res.refreshToken) {
                         console.error("Missing JWT or refresh token in response");
                         return null;
@@ -108,7 +107,7 @@ const handler = NextAuth({
                         refreshTokenExpires: new Date(res.refreshExpireDate!).getTime(),
                     };
                 } catch (error) {
-                    console.error("Error decoding JWT:", error);
+                    console.error("Error during authorization:", error);
                     return null;
                 }
             },
