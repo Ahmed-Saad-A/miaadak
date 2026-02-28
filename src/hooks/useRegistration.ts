@@ -140,7 +140,6 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
                 confirmPassword: formData.confirmPassword || '',
                 phoneNumber: formData.phoneNumber || '',
                 gender: formData.gender ?? 0,
-                userRole: userRole,
                 address: formData.address || '',
                 birthDate: birthDateISO,
             };

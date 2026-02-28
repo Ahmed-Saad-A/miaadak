@@ -16,8 +16,8 @@ interface AuthToken {
 interface DecodedToken {
     "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"?: string;
     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"?: string;
+    "http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid"?: string;
     email?: string;
-    [key: string]: unknown;
 }
 
 interface ExtendedUser extends User {
@@ -27,6 +27,7 @@ interface ExtendedUser extends User {
     refreshTokenExpires?: number;
     role?: string;
     roleNumber?: string;
+    userId?: string;
 }
 
 interface ExtendedToken extends JWT {
@@ -36,6 +37,7 @@ interface ExtendedToken extends JWT {
     refreshTokenExpires?: number;
     role?: string;
     roleNumber?: string;
+    userId?: string;
     error?: string;
 }
 
@@ -69,26 +71,38 @@ const handler = NextAuth({
                 try {
                     const res = await servicesApi.loginUser(credentials.email, credentials.password);
 
-                    console.log("API Response:", res); // للتشخيص
+                    console.log("API Response:", res);
 
-                    // ✅ إذا فشل تسجيل الدخول لأي سبب، نرجع null
                     if (!res.success) {
                         console.error("Login failed:", res.message);
                         return null;
                     }
 
-                    // ✅ التحقق من وجود الـ tokens
                     if (!res.jwt || !res.refreshToken) {
                         console.error("Missing JWT or refresh token in response");
                         return null;
                     }
 
                     const decoded: DecodedToken = jwtDecode(res.jwt);
+
+                    const userId =
+                        decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/primarysid"];
+
                     const roleFromToken =
                         decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-                    const roleName = ["Teacher", "Student", "Parent"].includes(roleFromToken || "")
+
+                    // const roleName = ["Teacher", "Student", "Parent"].includes(roleFromToken || "")
+                    //     ? roleFromToken
+                    //     : getRoleName(roleFromToken || "");
+
+                    let roleName = ["Teacher", "Student", "Parent"].includes(roleFromToken || "")
                         ? roleFromToken
                         : getRoleName(roleFromToken || "");
+
+                    // 👇 استثناء الأدمن
+                    if (credentials.email === "miaadakplatform@gmail.com") {
+                        roleName = "Admin";
+                    }
 
                     const email =
                         decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
@@ -100,12 +114,13 @@ const handler = NextAuth({
                         email,
                         name: email,
                         role: roleName,
+                        userId,
                         roleNumber: String(roleFromToken ?? ""),
                         accessToken: res.jwt,
                         refreshToken: res.refreshToken,
                         accessTokenExpires: new Date(res.jwtExpireDate!).getTime(),
                         refreshTokenExpires: new Date(res.refreshExpireDate!).getTime(),
-                    };
+                    } as ExtendedUser;
                 } catch (error) {
                     console.error("Error during authorization:", error);
                     return null;
@@ -132,6 +147,7 @@ const handler = NextAuth({
                     refreshTokenExpires: extendedUser.refreshTokenExpires,
                     role: extendedUser.role,
                     roleNumber: extendedUser.roleNumber,
+                    userId: extendedUser.userId,
                 };
             }
 
@@ -155,6 +171,7 @@ const handler = NextAuth({
                 refreshToken: extendedToken.refreshToken,
                 role: extendedToken.role,
                 roleNumber: extendedToken.roleNumber,
+                userId: extendedToken.userId,
             };
 
             return session;

@@ -154,8 +154,8 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 </div>
 
                 {/* Navigation Links */}
-                <nav className="flex flex-col gap-2 w-full px-2 flex-1 min-h-0">
-                    <div className="flex flex-col gap-2 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/30">
+                <nav className="flex flex-col gap-2 w-full px-2 flex-1 overflow-hidden">
+                    <div className="flex flex-col gap-2">
                         {routes.map((item) => {
                             const isDashboard =
                                 item.path === `/${role}` && pathname === `/${role}`;
@@ -164,22 +164,36 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                                 isDashboard ||
                                 (item.path !== `/${role}` && pathname.startsWith(item.path));
 
-
                             return (
-                                <Link
-                                    key={item.path}
-                                    href={item.path}
-                                    onClick={handleLinkClick}
-                                    className={`flex items-center gap-3 rounded-xl px-3 py-2 transition-all flex-shrink-0 ${isActive
-                                        ? "bg-white text-orange-500 font-semibold shadow-md"
-                                        : "text-white hover:bg-white/20"
+                                <div key={item.path} className="relative group">
+                                    <Link
+                                        href={item.path}
+                                        onClick={handleLinkClick}
+                                        className={`flex items-center gap-3 rounded-xl px-3 py-2 transition-all flex-shrink-0 ${
+                                            isActive
+                                                ? "bg-white text-orange-500 font-semibold shadow-md"
+                                                : "text-white hover:bg-white/20"
                                         }`}
-                                >
-                                    {icons[item.iconKey] || <LayoutDashboard size={20} />}
-                                    <span className={`whitespace-nowrap ${isOpen ? "lg:block" : "lg:hidden"} max-lg:block`}>
-                                        {item.label}
-                                    </span>
-                                </Link>
+                                    >
+                                        {icons[item.iconKey] || <LayoutDashboard size={20} />}
+                                        <span className={`whitespace-nowrap ${isOpen ? "lg:block" : "lg:hidden"} max-lg:block`}>
+                                            {item.label}
+                                        </span>
+                                    </Link>
+
+                                    {/* ✅ Tooltip - يظهر فقط في الشاشات الكبيرة لما السايدبار مقفول */}
+                                    {!isOpen && (
+                                        <div className="hidden lg:block absolute right-full top-1/2 -translate-y-1/2 mr-2 pointer-events-none z-50">
+                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-lg whitespace-nowrap text-sm font-medium">
+                                                {item.label}
+                                                {/* السهم */}
+                                                <div className="absolute left-full top-1/2 -translate-y-1/2 -ml-1">
+                                                    <div className="w-2 h-2 bg-gray-900 rotate-45"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             );
                         })}
                     </div>
