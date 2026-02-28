@@ -1,0 +1,317 @@
+/* ============================================================
+   DataTable — Premium AG Grid Theme
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap");
+
+/* ══════════════════════════════════════════════════════════════
+   CSS Variables
+══════════════════════════════════════════════════════════════ */
+.ag-theme-alpine {
+  --ag-font-family: "IBM Plex Sans Arabic", sans-serif !important;
+  --ag-font-size: 13.5px !important;
+
+  /* ── Palette ── */
+  --ag-background-color: #ffffff !important;
+  --ag-foreground-color: #1e293b !important;
+  --ag-secondary-foreground-color: #64748b !important;
+
+  /* ── Borders ── */
+  --ag-border-color: transparent !important;
+  --ag-row-border-color: #f1f5f9 !important;
+  --ag-borders: none !important;
+  --ag-border-radius: 0 !important;
+  --ag-wrapper-border-radius: 0 !important;
+
+  /* ── Header ── */
+  --ag-header-background-color: #f8fafc !important;
+  --ag-header-foreground-color: #94a3b8 !important;
+  --ag-header-height: 48px !important;
+  --ag-header-column-separator-display: none !important;
+  --ag-header-column-resize-handle-display: block !important;
+  --ag-header-column-resize-handle-color: #e2e8f0 !important;
+
+  /* ── Rows ── */
+  --ag-row-height: 54px !important;
+  --ag-row-hover-color: #f8faff !important;
+  --ag-odd-row-background-color: #ffffff !important;
+  --ag-selected-row-background-color: #eff6ff !important;
+
+  /* ── Cells ── */
+  --ag-cell-horizontal-padding: 20px !important;
+
+  /* ── Inputs ── */
+  --ag-input-border-color: #e2e8f0 !important;
+  --ag-input-focus-border-color: #6366f1 !important;
+  --ag-input-focus-box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+
+  /* ── Misc ── */
+  --ag-card-shadow: none !important;
+  --ag-popup-shadow: 0 20px 60px rgba(15, 23, 42, 0.12) !important;
+  --ag-control-panel-background-color: #f8fafc !important;
+  --ag-range-selection-border-color: #6366f1 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Wrapper — إزالة كل البوردرات الخارجية
+══════════════════════════════════════════════════════════════ */
+.ag-theme-alpine .ag-root-wrapper {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-family: "IBM Plex Sans Arabic", sans-serif !important;
+}
+
+.ag-theme-alpine .ag-root {
+  border: none !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Header
+══════════════════════════════════════════════════════════════ */
+.ag-theme-alpine .ag-header {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-top: none !important;
+}
+
+.ag-theme-alpine .ag-header-row {
+  border-bottom: none !important;
+}
+
+.ag-theme-alpine .ag-header-cell {
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #94a3b8 !important;
+  padding: 0 20px !important;
+  border-right: none !important;
+}
+
+.ag-theme-alpine .ag-header-cell:hover {
+  background: #f1f5f9 !important;
+  transition: background 0.15s ease;
+}
+
+.ag-theme-alpine .ag-header-cell-text {
+  overflow: visible !important;
+}
+
+.ag-theme-alpine .ag-sort-indicator-icon .ag-icon {
+  color: #6366f1 !important;
+  font-size: 14px !important;
+}
+
+/* ── Pinned header ── */
+.ag-theme-alpine .ag-pinned-left-header,
+.ag-theme-alpine .ag-pinned-right-header {
+  border: none !important;
+  background: #f8fafc !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Rows
+══════════════════════════════════════════════════════════════ */
+.ag-theme-alpine .ag-row {
+  border-bottom: 1px solid #f1f5f9 !important;
+  border-top: none !important;
+  transition:
+    background 0.12s ease,
+    box-shadow 0.12s ease !important;
+}
+
+.ag-theme-alpine .ag-row-even {
+  background: #ffffff !important;
+}
+
+.ag-theme-alpine .ag-row-odd {
+  background: #fafbfc !important;
+}
+
+.ag-theme-alpine .ag-row:hover {
+  background: #f5f7ff !important;
+  box-shadow: inset 3px 0 0 #6366f1 !important;
+}
+
+/* ── Selected Row — تظليل مميز ── */
+.ag-theme-alpine .ag-row-selected {
+  background: #eef2ff !important;
+  box-shadow: inset 3px 0 0 #6366f1 !important;
+}
+
+.ag-theme-alpine .ag-row-selected:hover {
+  background: #e8ecff !important;
+}
+
+/* ── Pinned rows ── */
+.ag-theme-alpine .ag-pinned-left-cols-container .ag-row,
+.ag-theme-alpine .ag-pinned-right-cols-container .ag-row {
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Cells
+══════════════════════════════════════════════════════════════ */
+.ag-theme-alpine .ag-cell {
+  display: flex !important;
+  align-items: center !important;
+  font-size: 13.5px !important;
+  color: #334155 !important;
+  padding: 0 20px !important;
+  line-height: 1.5 !important;
+  border: none !important;
+  border-right: none !important;
+}
+
+.ag-theme-alpine .ag-cell:focus,
+.ag-theme-alpine .ag-cell-focus:not(.ag-cell-range-selected) {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ── Pinned column separator ── */
+.ag-theme-alpine .ag-pinned-left-cols-container {
+  border-left: none !important;
+  border-right: 1px solid #e2e8f0 !important;
+  box-shadow: 4px 0 12px rgba(15, 23, 42, 0.06) !important;
+}
+
+.ag-theme-alpine .ag-pinned-right-cols-container {
+  border-left: 1px solid #e2e8f0 !important;
+  box-shadow: -4px 0 12px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Selection Checkbox
+══════════════════════════════════════════════════════════════ */
+.ag-theme-alpine .ag-checkbox-input-wrapper {
+  border-radius: 5px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  width: 17px !important;
+  height: 17px !important;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.ag-theme-alpine .ag-checkbox-input-wrapper:focus-within,
+.ag-theme-alpine .ag-checkbox-input-wrapper.ag-checked {
+  border-color: #6366f1 !important;
+  background: #6366f1 !important;
+}
+
+.ag-theme-alpine .ag-checkbox-input-wrapper.ag-checked::after {
+  color: #fff !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Pagination
+══════════════════════════════════════════════════════════════ */
+.ag-theme-alpine .ag-paging-panel {
+  border-top: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+  font-family: "IBM Plex Sans Arabic", sans-serif !important;
+  height: 50px !important;
+  padding: 0 20px !important;
+  gap: 8px !important;
+}
+
+.ag-theme-alpine .ag-paging-button {
+  border-radius: 7px !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition:
+    background 0.15s,
+    color 0.15s !important;
+  color: #475569 !important;
+}
+
+.ag-theme-alpine .ag-paging-button:hover:not(.ag-disabled) {
+  background: #eef2ff !important;
+  color: #6366f1 !important;
+}
+
+.ag-theme-alpine .ag-paging-button.ag-disabled {
+  color: #cbd5e1 !important;
+  cursor: not-allowed !important;
+  background: transparent !important;
+}
+
+.ag-theme-alpine .ag-paging-page-summary-panel {
+  gap: 4px !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Filter / Column Menu
+══════════════════════════════════════════════════════════════ */
+.ag-theme-alpine .ag-floating-filter-input,
+.ag-theme-alpine .ag-text-field-input,
+.ag-theme-alpine .ag-filter-filter {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  font-family: "IBM Plex Sans Arabic", sans-serif !important;
+  font-size: 12px !important;
+  background: #fff !important;
+  color: #334155 !important;
+}
+
+.ag-theme-alpine .ag-menu {
+  border-radius: 12px !important;
+  border: 1px solid #e8edf3 !important;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12) !important;
+  overflow: hidden !important;
+  font-family: "IBM Plex Sans Arabic", sans-serif !important;
+}
+
+.ag-theme-alpine .ag-menu-option-active {
+  background: #f5f7ff !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   No Rows Overlay
+══════════════════════════════════════════════════════════════ */
+.ag-theme-alpine .ag-overlay-no-rows-wrapper {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Scrollbar
+══════════════════════════════════════════════════════════════ */
+.ag-theme-alpine ::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.ag-theme-alpine ::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.ag-theme-alpine ::-webkit-scrollbar-thumb {
+  background: #dde3ed;
+  border-radius: 10px;
+}
+
+.ag-theme-alpine ::-webkit-scrollbar-thumb:hover {
+  background: #b8c4d4;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Column Resize Handle
+══════════════════════════════════════════════════════════════ */
+.ag-theme-alpine .ag-header-cell-resize::after {
+  background: #e2e8f0 !important;
+  width: 1px !important;
+  top: 20% !important;
+  height: 60% !important;
+}

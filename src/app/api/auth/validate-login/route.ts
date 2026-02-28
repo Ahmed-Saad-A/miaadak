@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
                 {
                     success: false,
                     error: "EmailNotConfirmed",
-                    message: "تم إرسال رابط تأكيد جديد إلى بريدك الإلكتروني",
+                    message: "يرجي الذهاب لتأكيد بريدك الألكتروني",
                     email
                 },
                 { status: 403 }
