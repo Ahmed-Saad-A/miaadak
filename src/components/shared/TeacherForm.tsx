@@ -8,7 +8,7 @@ import ProgressIndicator from "@/components/shared/ProgressIndicator";
 import { useRegistration } from "@/hooks";
 import { USER_ROLES, GENDER, Subject, TeacherFormData } from "@/interfaces";
 import toast from "react-hot-toast";
-import { servicesApi } from "@/services/authApi";
+import { studentApi } from "@/services/studentApi";
 
 
 
@@ -44,7 +44,7 @@ const TeacherForm = () => {
     const fetchSubjects = async () => {
       try {
         setIsSubjectsLoading(true);
-        const res = await servicesApi.getAllSubjects();
+        const res = await studentApi.getAllSubjects();
 
         if (res.isSucceeded) {
           setSubjects(res.data);

@@ -25,6 +25,7 @@ import {
     Info,
     Menu,
     X,
+    LayoutList,
 } from "lucide-react";
 import Image from "next/image";
 import MainLogo from "@/assets/mainLogo.png";
@@ -45,6 +46,7 @@ const icons: Record<string, JSX.Element> = {
     Lessons: <Book size={20} />,
     Children: <Users size={20} />,
     Users: <Users size={20} />,
+    GradeLevel: <LayoutList  size={20} />,
 };
 
 const guestNavigation = [
@@ -88,7 +90,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                     <Menu size={24} />
                 </button>
                 <div className="flex items-center gap-2">
-                    <Image src={MainLogo} alt="Logo" className="w-8 h-8" />
+                    <Image src={MainLogo} alt="Logo" className="w-8 h-8 dark:invert-0" />
                 </div>
                 <div className="flex items-center">
                     <UserDropdown
@@ -149,7 +151,7 @@ export default function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 {/* Logo - Desktop only */}
                 <div className="mb-8 hidden lg:block">
                     <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                        <Image src={MainLogo} alt="Logo" className="w-auto" />
+                        <Image src={MainLogo} alt="Logo" className="w-auto dark:invert-0" />
                     </div>
                 </div>
 

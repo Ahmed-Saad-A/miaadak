@@ -8,7 +8,7 @@ import ProgressIndicator from "./ProgressIndicator";
 import { useRegistration } from "@/hooks";
 import { USER_ROLES, GENDER, StudentFormData, Levels } from "@/interfaces";
 import toast from "react-hot-toast";
-import { servicesApi } from "@/services/authApi";
+import { studentApi } from "@/services/studentApi";
 
 
 const StudentForm = () => {
@@ -43,7 +43,7 @@ const StudentForm = () => {
     const fetchLevels = async () => {
       try {
         setIsLevelsLoading(true);
-        const res = await servicesApi.getAllLevels();
+        const res = await studentApi.getAllGradeLevels();
 
         if (res.isSucceeded) {
           setLevels(res.data);
