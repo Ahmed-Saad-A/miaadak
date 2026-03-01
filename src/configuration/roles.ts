@@ -46,6 +46,7 @@ export const roleRoutes = {
     { path: "/admin", label: "الرئيسية", iconKey: "Dashboard" },
     { path: "/admin/users", label: "المستخدمين", iconKey: "Users" },
     { path: "/admin/statistics", label: "الإحصائيات", iconKey: "Statistics" },
+    { path: "/admin/gradeLevel", label: "المستوي", iconKey: "GradeLevel" },
     { path: "/admin/packages", label: "الباقات", iconKey: "Book" },
     { path: "/admin/subscriptions", label: "الاشتراكات", iconKey: "Bookings" },
     { path: "/admin/settings", label: "الإعدادات", iconKey: "Settings" },

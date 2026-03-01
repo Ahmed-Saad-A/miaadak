@@ -8,6 +8,9 @@ import { Toaster } from "react-hot-toast";
 export const metadata: Metadata = {
   title: "Miaadak - Appointment Booking",
   description: "Book appointments easily with our modern booking platform",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
