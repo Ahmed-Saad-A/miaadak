@@ -1,10 +1,11 @@
-"use client";
+import Notifications from "@/components/system/notifications";
 
 export default function StudentNotifications() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">الإشعارات</h1>
-      <p className="text-gray-600">عرض الإشعارات</p>
-    </div>
+    <>
+      <Notifications
+        role="student"
+      />
+    </>
   );
 }

@@ -56,6 +56,19 @@ const getRoleName = (roleNumber: string | number): string => {
 
 const handler = NextAuth({
     secret: process.env.NEXTAUTH_SECRET,
+
+    // ✅ CRITICAL: Session configuration
+    session: {
+        strategy: "jwt",
+        maxAge: 30 * 24 * 60 * 60, // ✅ 30 days
+        updateAge: 24 * 60 * 60,   // ✅ Update every 24 hours
+    },
+
+    // ✅ JWT configuration
+    jwt: {
+        maxAge: 30 * 24 * 60 * 60, // ✅ 30 days
+    },
+
     providers: [
         CredentialsProvider({
             name: "Credentials",
@@ -71,15 +84,19 @@ const handler = NextAuth({
                 try {
                     const res = await servicesApi.loginUser(credentials.email, credentials.password);
 
-                    console.log("API Response:", res);
+                    console.log("✅ Login Response:", {
+                        success: res.success,
+                        hasJwt: !!res.jwt,
+                        hasRefreshToken: !!res.refreshToken,
+                    });
 
                     if (!res.success) {
-                        console.error("Login failed:", res.message);
+                        console.error("❌ Login failed:", res.message);
                         return null;
                     }
 
                     if (!res.jwt || !res.refreshToken) {
-                        console.error("Missing JWT or refresh token in response");
+                        console.error("❌ Missing JWT or refresh token");
                         return null;
                     }
 
@@ -91,15 +108,11 @@ const handler = NextAuth({
                     const roleFromToken =
                         decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
 
-                    // const roleName = ["Teacher", "Student", "Parent"].includes(roleFromToken || "")
-                    //     ? roleFromToken
-                    //     : getRoleName(roleFromToken || "");
-
                     let roleName = ["Teacher", "Student", "Parent"].includes(roleFromToken || "")
                         ? roleFromToken
                         : getRoleName(roleFromToken || "");
 
-                    // 👇 استثناء الأدمن
+                    // ✅ Admin exception
                     if (credentials.email === "miaadakplatform@gmail.com") {
                         roleName = "Admin";
                     }
@@ -108,6 +121,12 @@ const handler = NextAuth({
                         decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ||
                         decoded.email ||
                         credentials.email;
+
+                    console.log("✅ User authorized:", {
+                        email,
+                        role: roleName,
+                        userId,
+                    });
 
                     return {
                         id: credentials.email,
@@ -122,7 +141,7 @@ const handler = NextAuth({
                         refreshTokenExpires: new Date(res.refreshExpireDate!).getTime(),
                     } as ExtendedUser;
                 } catch (error) {
-                    console.error("Error during authorization:", error);
+                    console.error("❌ Error during authorization:", error);
                     return null;
                 }
             },
@@ -134,11 +153,13 @@ const handler = NextAuth({
     },
 
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
             const extendedUser = user as ExtendedUser | undefined;
             let extendedToken = token as ExtendedToken;
 
+            // ✅ Initial sign in
             if (extendedUser) {
+                console.log("🔑 Setting initial JWT token for:", extendedUser.email);
                 extendedToken = {
                     ...extendedToken,
                     accessToken: extendedUser.accessToken,
@@ -151,6 +172,13 @@ const handler = NextAuth({
                 };
             }
 
+            // ✅ Handle session update
+            if (trigger === "update" && session) {
+                console.log("🔄 Updating session");
+                extendedToken = { ...extendedToken, ...session };
+            }
+
+            // ✅ Return existing token if not expired
             if (
                 extendedToken.accessTokenExpires &&
                 Date.now() < extendedToken.accessTokenExpires
@@ -158,6 +186,8 @@ const handler = NextAuth({
                 return extendedToken;
             }
 
+            // ✅ Refresh token if expired
+            console.log("⏰ Token expired, refreshing...");
             const refreshed = await refreshAccessToken(extendedToken as Required<AuthToken>);
             return refreshed as ExtendedToken;
         },
@@ -165,8 +195,10 @@ const handler = NextAuth({
         async session({ session, token }) {
             const extendedToken = token as ExtendedToken;
 
+            // ✅ CRITICAL: Include role in session
             session.user = {
                 ...session.user,
+                id: extendedToken.sub || "",
                 accessToken: extendedToken.accessToken,
                 refreshToken: extendedToken.refreshToken,
                 role: extendedToken.role,
@@ -174,13 +206,24 @@ const handler = NextAuth({
                 userId: extendedToken.userId,
             };
 
+            console.log("📦 Session created:", {
+                email: session.user.email,
+                role: session.user.role,
+                hasToken: !!session.user.accessToken,
+            });
+
             return session;
         },
     },
+
+    // ✅ Enable debug in development
+    debug: process.env.NODE_ENV === "development",
 });
 
 async function refreshAccessToken(token: Required<AuthToken>): Promise<AuthToken> {
     try {
+        console.log("🔄 Attempting to refresh access token...");
+
         const res = await fetch("https://miaadak.runasp.net/api/v1/Account/RefreshToken", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -192,7 +235,12 @@ async function refreshAccessToken(token: Required<AuthToken>): Promise<AuthToken
 
         const data = await res.json();
 
-        if (!res.ok || !data.isSucceeded || !data.data) throw data;
+        if (!res.ok || !data.isSucceeded || !data.data) {
+            console.error("❌ Refresh token failed:", data);
+            throw data;
+        }
+
+        console.log("✅ Token refreshed successfully");
 
         return {
             ...token,
@@ -204,7 +252,7 @@ async function refreshAccessToken(token: Required<AuthToken>): Promise<AuthToken
             ).getTime(),
         };
     } catch (error) {
-        console.error("Refresh token error:", error);
+        console.error("❌ Refresh token error:", error);
         return { ...token, error: "RefreshTokenError" };
     }
 }

@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
     Plus, Pencil, Trash2, Check, X,
     Search, AlertTriangle, RefreshCw,
-    BookOpen,
+    GraduationCap, LayoutList,
 } from "lucide-react";
-import { Subject } from "@/interfaces/teacher";
 import { studentApi } from "@/services/studentApi";
+import { Levels } from "@/interfaces/student";
 
 type FormMode = "idle" | "add" | "edit" | "delete";
 
@@ -33,8 +33,8 @@ function arabicError(e: unknown): string {
 
 export default function Page() {
 
-    const [subjects, setSubjects] = useState<Subject[]>([]);
-    const [filtered, setFiltered] = useState<Subject[]>([]);
+    const [levels, setLevels] = useState<Levels[]>([]);
+    const [filtered, setFiltered] = useState<Levels[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [mode, setMode] = useState<FormMode>("idle");
@@ -46,9 +46,9 @@ export default function Page() {
     const [toast, setToast] = useState<{ msg: string; type: "ok" | "err" } | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const selectedSubject = useMemo(
-        () => (selectedId ? subjects.find(s => s.id === selectedId) ?? null : null),
-        [subjects, selectedId]
+    const selectedLevel = useMemo(
+        () => (selectedId ? levels.find(l => l.id === selectedId) ?? null : null),
+        [levels, selectedId]
     );
 
     // ── Toast ─────────────────────────────────────────────────────────────────
@@ -57,13 +57,13 @@ export default function Page() {
         setTimeout(() => setToast(null), 3000);
     };
 
-    // ── getAllSubjects ─────────────────────────────────────────────────────────
+    // ── Fetch ─────────────────────────────────────────────────────────────────
     const fetchAll = useCallback(async () => {
         setLoading(true); setApiError("");
         try {
-            const res = await studentApi.getAllSubjects();
+            const res = await studentApi.getAllGradeLevels();
             if (!res.isSucceeded) throw new Error(res.message ?? "");
-            setSubjects(res.data ?? []);
+            setLevels(res.data ?? []);
         } catch (e) {
             setApiError(arabicError(e));
         } finally {
@@ -74,9 +74,9 @@ export default function Page() {
     useEffect(() => { fetchAll(); }, [fetchAll]);
 
     useEffect(() => {
-        if (!search.trim()) { setFiltered(subjects); return; }
-        setFiltered(subjects.filter(s => s.name.toLowerCase().includes(search.toLowerCase())));
-    }, [search, subjects]);
+        if (!search.trim()) { setFiltered(levels); return; }
+        setFiltered(levels.filter(l => l.name.toLowerCase().includes(search.toLowerCase())));
+    }, [search, levels]);
 
     useEffect(() => {
         if (mode === "add" || mode === "edit") setTimeout(() => inputRef.current?.focus(), 60);
@@ -93,56 +93,54 @@ export default function Page() {
         setFieldError(""); setApiError("");
     };
 
-    const openEdit = (subject: Subject) => {
-        setSelectedId(subject.id); setNameInput(subject.name); setMode("edit");
+    const openEdit = (level: Levels) => {
+        setSelectedId(level.id); setNameInput(level.name); setMode("edit");
         setFieldError(""); setApiError("");
     };
 
-    const openDelete = (subject: Subject) => {
-        setSelectedId(subject.id); setMode("delete");
+    const openDelete = (level: Levels) => {
+        setSelectedId(level.id); setMode("delete");
         setFieldError(""); setApiError("");
     };
 
-    // ── createSubject — body: { name } ────────────────────────────────────────
+    // ── CRUD ──────────────────────────────────────────────────────────────────
     const handleCreate = async () => {
         const name = nameInput.trim();
-        if (!name) { setFieldError("اسم المادة مطلوب"); return; }
+        if (!name) { setFieldError("اسم المستوى مطلوب"); return; }
         setSaving(true); setFieldError(""); setApiError("");
         try {
-            const res = await studentApi.createSubject(name);
+            const res = await studentApi.createGradeLevel(name);
             if (!res.isSucceeded) throw new Error(res.message ?? "");
-            setSubjects(prev => [...prev, res.data]);
-            showToast("تم إضافة المادة بنجاح");
+            setLevels(prev => [...prev, res.data]);
+            showToast("تم إضافة المستوى بنجاح");
             cancel();
         } catch (e) { setApiError(arabicError(e)); }
         finally { setSaving(false); }
     };
 
-    // ── updateSubject — body: { id, name } ───────────────────────────────────
     const handleUpdate = async () => {
         if (selectedId === null) return;
         const name = nameInput.trim();
-        if (!name) { setFieldError("اسم المادة مطلوب"); return; }
+        if (!name) { setFieldError("اسم المستوى مطلوب"); return; }
         setSaving(true); setFieldError(""); setApiError("");
         try {
-            const res = await studentApi.updateSubject(selectedId, name);
+            const res = await studentApi.updateGradeLevel(selectedId, name);
             if (!res.isSucceeded) throw new Error(res.message ?? "");
-            setSubjects(prev => prev.map(s => s.id === selectedId ? res.data : s));
-            showToast("تم تعديل المادة بنجاح");
+            setLevels(prev => prev.map(l => l.id === selectedId ? res.data : l));
+            showToast("تم تعديل المستوى بنجاح");
             cancel();
         } catch (e) { setApiError(arabicError(e)); }
         finally { setSaving(false); }
     };
 
-    // ── deleteSubject — query: ?id={id} ──────────────────────────────────────
     const handleDelete = async () => {
         if (selectedId === null) return;
         setSaving(true); setApiError("");
         try {
-            const res = await studentApi.deleteSubject(selectedId);
+            const res = await studentApi.deleteGradeLevel(selectedId);
             if (!res.isSucceeded) throw new Error(res.message ?? "");
-            setSubjects(prev => prev.filter(s => s.id !== selectedId));
-            showToast("تم حذف المادة");
+            setLevels(prev => prev.filter(l => l.id !== selectedId));
+            showToast("تم حذف المستوى");
             cancel();
         } catch (e) { setApiError(arabicError(e)); }
         finally { setSaving(false); }
@@ -153,12 +151,8 @@ export default function Page() {
     // ─────────────────────────────────────────────────────────────────────────
     return (
         <div
-            className="min-h-screen bg-slate-50 p-6"
-            dir="rtl"
-            style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}
+            className="p-6"
         >
-            <style>{`@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap');`}</style>
-
             {/* Toast */}
             {toast && (
                 <div className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-xl
@@ -174,11 +168,11 @@ export default function Page() {
             <div className="mb-7 flex items-center justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-4">
                     <div className="w-11 h-11 rounded-xl bg-amber-500 flex items-center justify-center shadow-md shadow-amber-200">
-                        <BookOpen size={22} className="text-white" strokeWidth={2} />
+                        <LayoutList size={22} className="text-white" strokeWidth={2} />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-slate-800">المواد الدراسية</h1>
-                        <p className="text-slate-400 text-xs mt-0.5">إضافة وتعديل وحذف المواد الدراسية</p>
+                        <h1 className="text-xl font-bold text-slate-800">مستويات الطلبة</h1>
+                        <p className="text-slate-400 text-xs mt-0.5">إضافة وتعديل وحذف المستويات الدراسية</p>
                     </div>
                 </div>
 
@@ -191,7 +185,7 @@ export default function Page() {
                                hover:shadow-lg hover:shadow-amber-300 active:translate-y-0"
                 >
                     <Plus size={15} strokeWidth={2.5} />
-                    إضافة مادة
+                    إضافة مستوى
                 </button>
             </div>
 
@@ -213,13 +207,13 @@ export default function Page() {
                                         : <Pencil size={14} className="text-amber-600" />}
                                 </div>
                                 <p className="text-sm font-bold text-slate-700">
-                                    {mode === "add" ? "مادة جديدة" : `تعديل: ${selectedSubject?.name ?? ""}`}
+                                    {mode === "add" ? "مستوى جديد" : `تعديل: ${selectedLevel?.name ?? ""}`}
                                 </p>
                             </div>
 
                             <div className="mb-3">
                                 <label className="text-xs font-semibold text-slate-500 mb-1.5 block">
-                                    اسم المادة <span className="text-red-400">*</span>
+                                    اسم المستوى <span className="text-red-400">*</span>
                                 </label>
                                 <input
                                     ref={inputRef}
@@ -230,7 +224,7 @@ export default function Page() {
                                         if (e.key === "Enter") handleSave();
                                         if (e.key === "Escape") cancel();
                                     }}
-                                    placeholder="مثال: الرياضيات"
+                                    placeholder="مثال: الصف الثالث الإعدادي"
                                     className={`w-full px-3.5 py-2.5 text-sm rounded-xl border outline-none transition-all
                                                 text-slate-700 placeholder:text-slate-300
                                                 ${fieldError
@@ -273,7 +267,7 @@ export default function Page() {
                     )}
 
                     {/* Delete Confirm */}
-                    {mode === "delete" && selectedSubject && (
+                    {mode === "delete" && selectedLevel && (
                         <div className="bg-white rounded-2xl p-5 border border-red-100"
                             style={{ boxShadow: "0 0 0 1px #fecaca, 0 4px 20px rgba(239,68,68,0.08)" }}>
                             <div className="flex items-center gap-2 mb-3">
@@ -284,9 +278,9 @@ export default function Page() {
                             </div>
 
                             <p className="text-xs text-slate-500 leading-5 mb-4">
-                                سيتم حذف مادة{" "}
+                                سيتم حذف مستوى{" "}
                                 <span className="font-bold text-slate-700">
-                                    {`"${selectedSubject?.name ?? ""}"`}
+                                    {`"${selectedLevel?.name ?? ""}"`}
                                 </span>{" "}
                                 بشكل نهائي ولا يمكن التراجع عنه.
                             </p>
@@ -323,17 +317,17 @@ export default function Page() {
                     {/* Idle hint */}
                     {mode === "idle" && (
                         <div className="bg-white rounded-2xl p-5 border border-slate-100 text-center">
-                            <BookOpen size={28} className="text-slate-200 mx-auto mb-2" />
+                            <LayoutList size={28} className="text-slate-200 mx-auto mb-2" />
                             <p className="text-xs text-slate-400">
-                                اختر مادة للتعديل أو الحذف،<br />أو أضف مادة جديدة
+                                اختر مستوى للتعديل أو الحذف،<br />أو أضف مستوى جديداً
                             </p>
                         </div>
                     )}
 
                     {/* Count */}
                     <div className="bg-white rounded-2xl px-5 py-4 border border-slate-100 flex items-center justify-between">
-                        <span className="text-xs text-slate-500 font-medium">إجمالي المواد</span>
-                        <span className="text-xl font-bold text-amber-600">{subjects.length}</span>
+                        <span className="text-xs text-slate-500 font-medium">إجمالي المستويات</span>
+                        <span className="text-xl font-bold text-amber-600">{levels.length}</span>
                     </div>
                 </div>
 
@@ -345,8 +339,8 @@ export default function Page() {
                         {/* List Header */}
                         <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-3 flex-wrap">
                             <div className="flex items-center gap-2">
-                                <BookOpen size={16} className="text-amber-500" />
-                                <h2 className="font-bold text-slate-700 text-sm">قائمة المواد</h2>
+                                <LayoutList size={16} className="text-amber-500" />
+                                <h2 className="font-bold text-slate-700 text-sm">قائمة المستويات</h2>
                                 {!loading && (
                                     <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-600">
                                         {filtered.length}
@@ -390,32 +384,32 @@ export default function Page() {
                             {loading ? (
                                 <div className="flex flex-col items-center justify-center py-16 gap-3">
                                     <div className="w-8 h-8 rounded-full border-2 border-amber-100 border-t-amber-500 animate-spin" />
-                                    <p className="text-slate-400 text-xs">جاري تحميل المواد...</p>
+                                    <p className="text-slate-400 text-xs">جاري تحميل المستويات...</p>
                                 </div>
                             ) : filtered.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-300">
-                                    <BookOpen size={40} strokeWidth={1} />
+                                    <GraduationCap size={40} strokeWidth={1} />
                                     <p className="text-sm font-medium">
-                                        {search ? `لا نتائج لـ "${search}"` : "لا توجد مواد بعد"}
+                                        {search ? `لا نتائج لـ "${search}"` : "لا توجد مستويات بعد"}
                                     </p>
                                     {!search && (
                                         <button
                                             onClick={openAdd}
                                             className="text-xs text-amber-500 hover:text-amber-600 font-bold mt-1 underline underline-offset-2"
                                         >
-                                            + أضف أول مادة الآن
+                                            + أضف أول مستوى الآن
                                         </button>
                                     )}
                                 </div>
                             ) : (
                                 <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-                                    {filtered?.map((subject, idx) => {
-                                        const isEditing = selectedId === subject?.id && mode === "edit";
-                                        const isDeleting = selectedId === subject?.id && mode === "delete";
+                                    {filtered.map((level, idx) => {
+                                        const isEditing = selectedId === level.id && mode === "edit";
+                                        const isDeleting = selectedId === level.id && mode === "delete";
 
                                         return (
                                             <div
-                                                key={subject?.id}
+                                                key={level.id}
                                                 className={`group flex items-center justify-between gap-2 px-4 py-3.5
                                                             rounded-xl border transition-all duration-150
                                                             ${isEditing
@@ -438,16 +432,16 @@ export default function Page() {
                                                     </span>
                                                     <div className="min-w-0">
                                                         <p className="text-sm font-semibold text-slate-700 truncate">
-                                                            {subject?.name}
+                                                            {level.name}
                                                         </p>
-                                                        <p className="text-[10px] text-slate-400">رقم: {subject?.id}</p>
+                                                        <p className="text-[10px] text-slate-400">رقم: {level.id}</p>
                                                     </div>
                                                 </div>
 
                                                 <div className={`flex items-center gap-1 flex-shrink-0 transition-opacity
                                                                  ${isEditing || isDeleting ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
                                                     <button
-                                                        onClick={() => isEditing ? cancel() : openEdit(subject)}
+                                                        onClick={() => isEditing ? cancel() : openEdit(level)}
                                                         title="تعديل"
                                                         className={`p-1.5 rounded-lg transition-colors
                                                                     ${isEditing
@@ -458,7 +452,7 @@ export default function Page() {
                                                         <Pencil size={12} />
                                                     </button>
                                                     <button
-                                                        onClick={() => isDeleting ? cancel() : openDelete(subject)}
+                                                        onClick={() => isDeleting ? cancel() : openDelete(level)}
                                                         title="حذف"
                                                         className={`p-1.5 rounded-lg transition-colors
                                                                     ${isDeleting
