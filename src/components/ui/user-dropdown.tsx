@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, LogOut, UserCircle } from "lucide-react";
+import { User, LogOut, UserCircle, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -22,6 +22,7 @@ interface UserDropdownProps {
     userRole: string | null;
     onLogout: () => void;
     isMobile?: boolean;
+    unreadCount?: number; // عدد الإشعارات غير المقروءة
 }
 
 export function UserDropdown({
@@ -30,6 +31,7 @@ export function UserDropdown({
     userRole,
     onLogout,
     isMobile = false,
+    unreadCount = 0,
 }: UserDropdownProps) {
     const pathname = usePathname();
 
@@ -77,7 +79,6 @@ export function UserDropdown({
                             <User className="h-5 w-5" />
                         </AvatarFallback>
                     </Avatar>
-
                     <div className="flex flex-col">
                         <p className="font-medium text-sm">{userEmail}</p>
                         <p className="text-xs text-gray-500">{userRole}</p>
@@ -104,50 +105,83 @@ export function UserDropdown({
     }
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10">
-                        <Image src={user} alt={userEmail || "User"} />
-                        <AvatarFallback className="bg-orange-100 text-orange-600">
-                            <User className="h-5 w-5" />
-                        </AvatarFallback>
-                    </Avatar>
-                </Button>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent
-                className="w-fit mt-2 rounded-xl border border-gray-100 bg-white shadow-lg p-2"
-                align="start"
-            >
-                <div className="flex items-center gap-3 p-2 border-b border-gray-100 mb-2">
-                    <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-orange-100 text-orange-600">
-                            <User className="h-4 w-4" />
-                        </AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <p className="text-sm font-medium max-w">{userEmail}</p>
-                        <p className="text-xs text-gray-500">{userRole}</p>
-                    </div>
-                </div>
-
-                <DropdownMenuItem asChild>
-                    <Link href="/profile" className="flex items-center gap-2">
-                        <UserCircle className="h-4 w-4 text-orange-500" />
-                        الملف الشخصي
-                    </Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 text-red-600 focus:bg-red-50"
+        <div className="flex items-center gap-1">
+            {/* ✅ أيقونة الإشعارات */}
+            <Link href="/notifications">
+                <Button
+                    variant="ghost"
+                    className="relative h-10 w-10 rounded-full hover:bg-white/20 text-white"
+                    aria-label="الإشعارات"
                 >
-                    <LogOut className="h-4 w-4" />
-                    تسجيل الخروج
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+                    <Bell size={20} />
+                    {/* Badge عدد الإشعارات */}
+                    {unreadCount > 0 && (
+                        <span className="absolute top-1 right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center leading-none">
+                            {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                    )}
+                </Button>
+            </Link>
+
+            {/* Avatar Dropdown */}
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                        <Avatar className="h-10 w-10">
+                            <Image src={user} alt={userEmail || "User"} />
+                            <AvatarFallback className="bg-orange-100 text-orange-600">
+                                <User className="h-5 w-5" />
+                            </AvatarFallback>
+                        </Avatar>
+                    </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent
+                    className="w-fit mt-2 rounded-xl border border-gray-100 bg-white shadow-lg p-2"
+                    align="start"
+                >
+                    <div className="flex items-center gap-3 p-2 border-b border-gray-100 mb-2">
+                        <Avatar className="h-8 w-8">
+                            <AvatarFallback className="bg-orange-100 text-orange-600">
+                                <User className="h-4 w-4" />
+                            </AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <p className="text-sm font-medium">{userEmail}</p>
+                            <p className="text-xs text-gray-500">{userRole}</p>
+                        </div>
+                    </div>
+
+                    <DropdownMenuItem asChild>
+                        <Link href="/settings" className="flex items-center gap-2">
+                            الملف الشخصي
+                            <UserCircle className="h-4 w-4 text-orange-500" />
+                        </Link>
+                    </DropdownMenuItem>
+
+                    {/* ✅ Notifications في الـ Dropdown كـ shortcut ثاني */}
+                    <DropdownMenuItem asChild>
+                        <Link href="/notifications" className="flex items-center gap-2">
+                            <span>الإشعارات</span>
+                            <Bell className="h-4 w-4 text-orange-500" />
+                            {unreadCount > 0 && (
+                                <span className="mr-auto h-5 w-5 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center">
+                                    {unreadCount > 9 ? "9+" : unreadCount}
+                                </span>
+                            )}
+                        </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 text-red-600 focus:bg-red-50"
+                    >
+                        <LogOut className="h-4 w-4" />
+                        تسجيل الخروج
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
     );
 }
 

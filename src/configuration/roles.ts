@@ -7,8 +7,8 @@ export const roleRoutes = {
     { path: "/teacher/attendance", label: "الغياب", iconKey: "Attendance" },
     { path: "/teacher/assistant", label: "المساعدين", iconKey: "Assistant" },
     { path: "/teacher/grades", label: "الدرجات", iconKey: "Grades" },
-    { path: "/teacher/notifications", label: "الإشعارات", iconKey: "Notifications" },
-    { path: "/teacher/settings", label: "الإعدادات", iconKey: "Settings" },
+    // { path: "/teacher/notifications", label: "الإشعارات", iconKey: "Notifications" },
+    // { path: "/teacher/settings", label: "الملف الشخصي", iconKey: "Settings" },
     { path: "/teacher/sessions", label: "الحصص", iconKey: "Lessons" },
     { path: "/teacher/exams", label: "الامتحانات", iconKey: "ClipboardList" },
     { path: "/teacher/subscriptions", label: "الاشتراكات", iconKey: "Bookings" },
@@ -20,8 +20,8 @@ export const roleRoutes = {
     { path: "/student/lessons", label: "المحاضرات", iconKey: "Lessons" },
     { path: "/student/schedule", label: "جدولي", iconKey: "Schedule" },
     { path: "/student/grades", label: "الدرجات", iconKey: "Grades" },
-    { path: "/student/notifications", label: "الإشعارات", iconKey: "Notifications" },
-    { path: "/student/settings", label: "الإعدادات", iconKey: "Settings" },
+    // { path: "/student/notifications", label: "الإشعارات", iconKey: "Notifications" },
+    // { path: "/student/settings", label: "الملف الشخصي", iconKey: "Settings" },
     { path: "/student/bookings", label: "الحجوزات", iconKey: "Bookings" },
     { path: "/student/teachers", label: "المعلمين", iconKey: "Users" },
   ],
@@ -31,15 +31,15 @@ export const roleRoutes = {
     { path: "/parent/children", label: "الأبناء", iconKey: "Children" },
     { path: "/parent/attendance", label: "الغياب", iconKey: "Attendance" },
     { path: "/parent/grades", label: "الدرجات", iconKey: "Grades" },
-    { path: "/parent/notifications", label: "الإشعارات", iconKey: "Notifications" },
-    { path: "/parent/settings", label: "الإعدادات", iconKey: "Settings" },
+    // { path: "/parent/notifications", label: "الإشعارات", iconKey: "Notifications" },
+    // { path: "/parent/settings", label: "الملف الشخصي", iconKey: "Settings" },
   ],
 
   assistant: [
     { path: "/assistant", label: "الرئيسية", iconKey: "Dashboard" },
     { path: "/assistant/attendance", label: "الغياب", iconKey: "Attendance" },
     { path: "/assistant/bookings", label: "الحجوزات", iconKey: "Bookings" },
-    { path: "/assistant/notifications", label: "الإشعارات", iconKey: "Notifications" },
+    // { path: "/assistant/notifications", label: "الإشعارات", iconKey: "Notifications" },
   ],
 
   admin: [
@@ -49,6 +49,6 @@ export const roleRoutes = {
     { path: "/admin/gradeLevel", label: "المستوي", iconKey: "GradeLevel" },
     { path: "/admin/packages", label: "الباقات", iconKey: "Book" },
     { path: "/admin/subscriptions", label: "الاشتراكات", iconKey: "Bookings" },
-    { path: "/admin/settings", label: "الإعدادات", iconKey: "Settings" },
+    // { path: "/admin/settings", label: "الملف الشخصي", iconKey: "Settings" },
   ],
 };
