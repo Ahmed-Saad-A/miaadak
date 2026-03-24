@@ -6,10 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import ProgressIndicator from "./ProgressIndicator";
 import { useRegistration } from "@/hooks";
-import { USER_ROLES, GENDER, ParentRegistrationData } from "@/interfaces";
+import { USER_ROLES, GENDER, ParentFormData } from "@/interfaces";
 import toast from "react-hot-toast";
 
-type ParentFormData = ParentRegistrationData;
+// type ParentFormData = ParentFormData;
 
 const ParentForm = () => {
   const router = useRouter();
