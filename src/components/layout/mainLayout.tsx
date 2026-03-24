@@ -11,7 +11,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50">
+        <div className="min-h-screen flex flex-col bg-[#f4f4f4]">
             <div className={`flex flex-1 flex-row-reverse relative transition-all duration-300 ${isSidebarOpen ? "mr-[15rem]" : "mr-20"}`}>
                 {/* Sidebar */}
                 {user && (
@@ -24,7 +24,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     <Navbar />
 
                     {/* Main content */}
-                    <main className="max-w-[95vw] bg-white flex-1 rounded-2xl transition-all duration-300 shadow-md mx-2 my-2">
+                    <main className="max-w-[95vw] bg-white flex-1 rounded-2xl transition-all duration-300 mx-2 my-2">
                         {children}
                     </main>
                 </div>

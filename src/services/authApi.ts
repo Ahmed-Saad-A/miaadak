@@ -1,4 +1,5 @@
-import { UserRegistration, ApiResponse, AuthToken, Subject, Levels } from '@/interfaces';
+import { UserRegistration, ApiResponse, AuthToken, Subject, Levels, TeacherFormData, StudentFormData, ParentFormData } from '@/interfaces';
+import { AssistantFormData } from '@/interfaces/assistant';
 
 export interface RegisterResponse extends ApiResponse<string> { endpoint?: "register" }
 
@@ -19,7 +20,7 @@ class ServicesApi {
     }
 
     // =========== Register Teacher ===========
-    async registerTeacher(data: UserRegistration): Promise<RegisterResponse> {
+    async registerTeacher(data: TeacherFormData): Promise<RegisterResponse> {
         const response = await fetch(`${this.#baseUrl}api/v1/Account/Register/Teacher`, {
             method: "POST",
             headers: this.#getHeaders(),
@@ -33,25 +34,8 @@ class ServicesApi {
         return (await response.json()) as RegisterResponse;
     }
 
-    // =========== Get All Subjects ===========
-    async getAllSubjects(): Promise<ApiResponse<Subject[]>> {
-        const response = await fetch(
-            `${this.#baseUrl}api/v1/Subject/GetAllSubjects`,
-            {
-                method: "GET",
-                headers: this.#getHeaders(),
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch subjects");
-        }
-
-        return (await response.json()) as ApiResponse<Subject[]>;
-    }
-
     // =========== Register Student ===========
-    async registerStudent(data: UserRegistration): Promise<RegisterResponse> {
+    async registerStudent(data: StudentFormData): Promise<RegisterResponse> {
         const response = await fetch(`${this.#baseUrl}api/v1/Account/Register/Student`, {
             method: "POST",
             headers: this.#getHeaders(),
@@ -65,25 +49,8 @@ class ServicesApi {
         return (await response.json()) as RegisterResponse;
     }
 
-    // =========== Get All Levels ===========
-    async getAllLevels(): Promise<ApiResponse<Levels[]>> {
-        const response = await fetch(
-            `${this.#baseUrl}api/v1/GradeLevel/GetAllGradeLevels`,
-            {
-                method: "GET",
-                headers: this.#getHeaders(),
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error("Failed to fetch levels");
-        }
-
-        return (await response.json()) as ApiResponse<Levels[]>;
-    }
-
     // =========== Register Parent ===========
-    async registerParent(data: UserRegistration): Promise<RegisterResponse> {
+    async registerParent(data: ParentFormData): Promise<RegisterResponse> {
         const response = await fetch(`${this.#baseUrl}api/v1/Account/Register/Parent`, {
             method: "POST",
             headers: this.#getHeaders(),
@@ -98,7 +65,7 @@ class ServicesApi {
     }
 
     // =========== Register Assistant ===========
-    async registerAssistant(data: UserRegistration): Promise<RegisterResponse> {
+    async registerAssistant(data: AssistantFormData): Promise<RegisterResponse> {
         const response = await fetch(`${this.#baseUrl}api/v1/Account/Register/Assistant`, {
             method: "POST",
             headers: this.#getHeaders(),
@@ -110,22 +77,6 @@ class ServicesApi {
         }
 
         return (await response.json()) as RegisterResponse;
-    }
-
-    // =========== Register User (routes based on userRole) ===========
-    async registerUser(data: UserRegistration): Promise<RegisterResponse> {
-        switch (data.userRole) {
-            case 1: // TEACHER
-                return this.registerTeacher(data);
-            case 2: // STUDENT
-                return this.registerStudent(data);
-            case 3: // PARENT
-                return this.registerParent(data);
-            case 4: // ASSISTANT
-                return this.registerAssistant(data);
-            default:
-                throw new Error("Invalid user role");
-        }
     }
 
     // =========== Login User ===========

@@ -140,7 +140,6 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
                 confirmPassword: formData.confirmPassword || '',
                 phoneNumber: formData.phoneNumber || '',
                 gender: formData.gender ?? 0,
-                userRole: userRole,
                 address: formData.address || '',
                 birthDate: birthDateISO,
             };
@@ -162,14 +161,14 @@ export const useRegistration = ({ userRole }: UseRegistrationProps) => {
                 registrationData.school = formData.school || '';
             }
 
-            const response = await servicesApi.registerUser(registrationData);
+            // const response = await servicesApi.registerUser(registrationData);
 
-            if (response.isSucceeded) {
-                toast.success('تم التسجيل بنجاح! يرجى التحقق من بريدك الإلكتروني');
-                router.push(`/auth/register/confirm-email?email=${encodeURIComponent(registrationData.email)}`);
-            } else {
-                toast.error(response.message || 'حدث خطأ أثناء التسجيل');
-            }
+            // if (response.isSucceeded) {
+            //     toast.success('تم التسجيل بنجاح! يرجى التحقق من بريدك الإلكتروني');
+            //     router.push(`/auth/register/confirm-email?email=${encodeURIComponent(registrationData.email)}`);
+            // } else {
+            //     toast.error(response.message || 'حدث خطأ أثناء التسجيل');
+            // }
         } catch (error) {
             console.error('Registration error:', error);
             toast.error('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى');

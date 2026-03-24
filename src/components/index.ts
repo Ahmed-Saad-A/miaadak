@@ -1,4 +1,5 @@
 export * from "./ui"
 export * from "./layout"
-export * from "./shared/schema/registerSchema"
+export * from "./shared"
 export * from "./landing"
+export * from "./system"

@@ -6,7 +6,7 @@ export interface UserRegistration {
   confirmPassword: string;
   phoneNumber: string;
   gender: number;
-  userRole: number;
+  // userRole: number;
   address?: string;
   birthDate?: string;
   subjectId?: number | number[];
@@ -14,4 +14,9 @@ export interface UserRegistration {
   parentPhone?: string;
   levelId?: number;
   school?: string;
+  teacherIdC?: string;
+  canManageStudents?: boolean;
+  canManageSessions?: boolean;
+  canManageAttendance?: boolean;
+  canManageExams?: boolean;
 }
