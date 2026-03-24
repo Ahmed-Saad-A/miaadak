@@ -33,164 +33,154 @@ export default function TeacherDashboard() {
     });
 
     const [upcomingSessions] = useState([
-        { id: 1, title: "مراجعة الجبر", date: "2025-01-19", time: "10:00", students: 8, maxStudents: 12, type: "Online" },
-        { id: 2, title: "الهندسة الفراغية", date: "2025-01-19", time: "15:00", students: 10, maxStudents: 10, type: "Offline" },
-        { id: 3, title: "التفاضل والتكامل", date: "2025-01-20", time: "11:00", students: 6, maxStudents: 15, type: "Online" }
+        { id: 1, title: "مراجعة الجبر",         date: "2025-01-19", time: "10:00", students: 8,  maxStudents: 12, type: "Online"   },
+        { id: 2, title: "الهندسة الفراغية",      date: "2025-01-19", time: "15:00", students: 10, maxStudents: 10, type: "Offline"  },
+        { id: 3, title: "التفاضل والتكامل",      date: "2025-01-20", time: "11:00", students: 6,  maxStudents: 15, type: "Online"   },
     ]);
 
     const [recentBookings] = useState([
-        { id: 1, student: "محمد علي", session: "مراجعة الجبر", date: "2025-01-18", status: "Confirmed" },
-        { id: 2, student: "فاطمة أحمد", session: "الهندسة الفراغية", date: "2025-01-18", status: "Pending" },
-        { id: 3, student: "عمر خالد", session: "التفاضل والتكامل", date: "2025-01-17", status: "Confirmed" }
+        { id: 1, student: "محمد علي",    session: "مراجعة الجبر",    date: "2025-01-18", status: "Confirmed" },
+        { id: 2, student: "فاطمة أحمد", session: "الهندسة الفراغية", date: "2025-01-18", status: "Pending"   },
+        { id: 3, student: "عمر خالد",   session: "التفاضل والتكامل", date: "2025-01-17", status: "Confirmed" },
     ]);
 
     return (
-        <div className="min-h-screen bg-[#f4f4f4] p-6" dir="rtl">
+        <div className="min-h-screen bg-slate-50 p-6" dir="rtl">
             <div className="max-w-7xl mx-auto space-y-6">
-                
-                {/* Header Section */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                    <div className="flex items-start justify-between">
+
+                {/* ── Header ──────────────────────────────────────────────── */}
+                <div className="bg-white rounded-2xl shadow-sm p-6 border border-slate-100">
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
                         <div className="flex items-center gap-4">
-                            <img src={teacher.avatar} alt="avatar" className="w-20 h-20 rounded-full border-4 border-indigo-100" />
+                            <img
+                                src={teacher.avatar}
+                                alt="avatar"
+                                className="w-20 h-20 rounded-full border-4 border-orange-100"
+                            />
                             <div>
-                                <h1 className="text-3xl font-bold text-gray-800">مرحباً، {teacher.name}</h1>
-                                <p className="text-gray-600 mt-1">معلم {teacher.subject} • {teacher.experienceYears} سنوات خبرة</p>
-                                <div className="flex items-center gap-4 mt-2">
+                                <h1 className="text-2xl font-black text-slate-800">مرحباً، {teacher.name}</h1>
+                                <p className="text-slate-500 mt-1 text-sm">
+                                    معلم {teacher.subject} • {teacher.experienceYears} سنوات خبرة
+                                </p>
+                                <div className="flex items-center gap-4 mt-2 flex-wrap">
                                     <div className="flex items-center gap-1">
-                                        <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                                        <span className="font-semibold text-gray-800">{teacher.rating}</span>
-                                        <span className="text-gray-500 text-sm">({teacher.totalRatings} تقييم)</span>
+                                        <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                                        <span className="font-bold text-slate-800 text-sm">{teacher.rating}</span>
+                                        <span className="text-slate-400 text-xs">({teacher.totalRatings} تقييم)</span>
                                     </div>
                                     <div className="flex items-center gap-1">
-                                        <TrendingUp className="w-5 h-5 text-green-600" />
-                                        <span className="font-semibold text-green-600">{teacher.strengthPercentage}%</span>
-                                        <span className="text-gray-500 text-sm">قوة الأداء</span>
+                                        <TrendingUp className="w-4 h-4 text-orange-500" />
+                                        <span className="font-bold text-orange-600 text-sm">{teacher.strengthPercentage}%</span>
+                                        <span className="text-slate-400 text-xs">قوة الأداء</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <button className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition flex items-center gap-2 shadow-md">
-                            <Plus className="w-5 h-5" />
+                        <button className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl
+                                           transition flex items-center gap-2 shadow-md shadow-orange-200 text-sm font-bold">
+                            <Plus className="w-4 h-4" />
                             إنشاء حصة جديدة
                         </button>
                     </div>
                 </div>
 
-                {/* Subscription Alert */}
+                {/* ── Subscription Banner ──────────────────────────────────── */}
                 {subscription.isActive ? (
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-4 flex items-center justify-between">
+                    <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 flex items-center justify-between gap-4 flex-wrap">
                         <div className="flex items-center gap-3">
-                            <CheckCircle className="w-6 h-6 text-green-600" />
+                            <CheckCircle className="w-5 h-5 text-orange-500 flex-shrink-0" />
                             <div>
-                                <p className="font-semibold text-gray-800">{subscription.packageName} نشط</p>
-                                <p className="text-sm text-gray-600">استخدمت {subscription.sessionsUsed} من {subscription.maxSessions} حصة • متبقي {subscription.daysRemaining} يوم</p>
+                                <p className="font-bold text-slate-800 text-sm">{subscription.packageName} — نشط</p>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    استخدمت {subscription.sessionsUsed} من {subscription.maxSessions} حصة
+                                    &nbsp;•&nbsp; متبقي {subscription.daysRemaining} يوم
+                                </p>
                             </div>
                         </div>
-                        <span className="text-sm text-gray-600">ينتهي في {subscription.endDate}</span>
+                        <span className="text-xs text-slate-400">ينتهي في {subscription.endDate}</span>
                     </div>
                 ) : (
-                    <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-2xl p-4 flex items-center justify-between">
+                    <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center justify-between gap-4 flex-wrap">
                         <div className="flex items-center gap-3">
-                            <AlertCircle className="w-6 h-6 text-red-600" />
+                            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
                             <div>
-                                <p className="font-semibold text-gray-800">لا يوجد اشتراك نشط</p>
-                                <p className="text-sm text-gray-600">قم بتجديد اشتراكك لمواصلة إنشاء الحصص</p>
+                                <p className="font-bold text-slate-800 text-sm">لا يوجد اشتراك نشط</p>
+                                <p className="text-xs text-slate-500 mt-0.5">قم بتجديد اشتراكك لمواصلة إنشاء الحصص</p>
                             </div>
                         </div>
-                        <button className="bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition text-sm">
+                        <button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl
+                                           text-xs font-bold transition shadow-sm shadow-orange-200">
                             تجديد الآن
                         </button>
                     </div>
                 )}
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-600 text-sm">إجمالي الحصص</p>
-                                <p className="text-3xl font-bold text-gray-800 mt-1">{stats.totalSessions}</p>
-                            </div>
-                            <div className="bg-blue-100 p-3 rounded-lg">
-                                <BookOpen className="w-6 h-6 text-blue-600" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-600 text-sm">الحصص القادمة</p>
-                                <p className="text-3xl font-bold text-gray-800 mt-1">{stats.upcomingSessions}</p>
-                            </div>
-                            <div className="bg-purple-100 p-3 rounded-lg">
-                                <Clock className="w-6 h-6 text-purple-600" />
+                {/* ── Stats Grid ───────────────────────────────────────────── */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[
+                        { label: "إجمالي الحصص",     value: stats.totalSessions,    sub: null,                               icon: BookOpen, bg: "bg-orange-50",  icon_c: "text-orange-500" },
+                        { label: "الحصص القادمة",    value: stats.upcomingSessions,  sub: null,                               icon: Clock,    bg: "bg-amber-50",   icon_c: "text-amber-500"  },
+                        { label: "الطلاب النشطون",   value: stats.activeStudents,    sub: `من أصل ${stats.totalStudents}`,    icon: Users,    bg: "bg-orange-50",  icon_c: "text-orange-500" },
+                        { label: "الحجوزات المعلقة", value: stats.pendingBookings,   sub: null,                               icon: Calendar, bg: "bg-amber-50",   icon_c: "text-amber-500"  },
+                    ].map(({ label, value, sub, icon: Icon, bg, icon_c }) => (
+                        <div key={label} className="bg-white rounded-2xl shadow-sm p-5 border border-slate-100 hover:shadow-md hover:shadow-orange-100 transition">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-slate-500 text-xs font-semibold">{label}</p>
+                                    <p className="text-3xl font-black text-slate-800 mt-1">{value}</p>
+                                    {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
+                                </div>
+                                <div className={`${bg} p-3 rounded-xl`}>
+                                    <Icon className={`w-5 h-5 ${icon_c}`} strokeWidth={1.8} />
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-600 text-sm">الطلاب النشطون</p>
-                                <p className="text-3xl font-bold text-gray-800 mt-1">{stats.activeStudents}</p>
-                                <p className="text-xs text-gray-500 mt-1">من أصل {stats.totalStudents}</p>
-                            </div>
-                            <div className="bg-green-100 p-3 rounded-lg">
-                                <Users className="w-6 h-6 text-green-600" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-600 text-sm">الحجوزات المعلقة</p>
-                                <p className="text-3xl font-bold text-gray-800 mt-1">{stats.pendingBookings}</p>
-                            </div>
-                            <div className="bg-orange-100 p-3 rounded-lg">
-                                <Calendar className="w-6 h-6 text-orange-600" />
-                            </div>
-                        </div>
-                    </div>
+                    ))}
                 </div>
 
-                {/* Main Content Grid */}
+                {/* ── Main Grid ─────────────────────────────────────────────── */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
+
                     {/* Upcoming Sessions */}
-                    <div className="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-800">الحصص القادمة</h2>
-                            <button className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">عرض الكل</button>
+                    <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-6 border border-slate-100">
+                        <div className="flex items-center justify-between mb-5">
+                            <h2 className="text-base font-black text-slate-800">الحصص القادمة</h2>
+                            <button className="text-orange-500 hover:text-orange-600 text-xs font-bold transition">
+                                عرض الكل
+                            </button>
                         </div>
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             {upcomingSessions.map(session => (
-                                <div key={session.id} className="border border-gray-200 rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex-1">
-                                            <h3 className="font-semibold text-gray-800">{session.title}</h3>
-                                            <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                <div key={session.id}
+                                     className="border border-slate-100 rounded-xl p-4 hover:border-orange-200
+                                                hover:bg-orange-50/30 transition">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="font-bold text-slate-800 text-sm">{session.title}</h3>
+                                            <div className="flex items-center gap-3 mt-2 text-xs text-slate-500 flex-wrap">
                                                 <span className="flex items-center gap-1">
-                                                    <Calendar className="w-4 h-4" />
-                                                    {session.date}
+                                                    <Calendar className="w-3.5 h-3.5" />{session.date}
                                                 </span>
                                                 <span className="flex items-center gap-1">
-                                                    <Clock className="w-4 h-4" />
-                                                    {session.time}
+                                                    <Clock className="w-3.5 h-3.5" />{session.time}
                                                 </span>
-                                                <span className={`px-2 py-1 rounded text-xs ${session.type === 'Online' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
-                                                    {session.type === 'Online' ? 'أونلاين' : 'حضوري'}
+                                                <span className={`px-2 py-0.5 rounded-lg text-[11px] font-bold
+                                                    ${session.type === "Online"
+                                                        ? "bg-orange-100 text-orange-700"
+                                                        : "bg-slate-100 text-slate-600"}`}>
+                                                    {session.type === "Online" ? "أونلاين" : "حضوري"}
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="text-left">
-                                            <div className={`flex items-center gap-1 ${session.students >= session.maxStudents ? 'text-red-600' : 'text-green-600'}`}>
+                                        <div className="text-left flex-shrink-0">
+                                            <div className={`flex items-center gap-1 text-sm font-black
+                                                ${session.students >= session.maxStudents
+                                                    ? "text-red-500"
+                                                    : "text-orange-600"}`}>
                                                 <Users className="w-4 h-4" />
-                                                <span className="font-semibold">{session.students}/{session.maxStudents}</span>
+                                                {session.students}/{session.maxStudents}
                                             </div>
-                                            <p className="text-xs text-gray-500 mt-1">طالب</p>
+                                            <p className="text-[10px] text-slate-400 mt-0.5">طالب</p>
                                         </div>
                                     </div>
                                 </div>
@@ -199,21 +189,23 @@ export default function TeacherDashboard() {
                     </div>
 
                     {/* Recent Bookings */}
-                    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-800">الحجوزات الأخيرة</h2>
-                        </div>
+                    <div className="bg-white rounded-2xl shadow-sm p-6 border border-slate-100">
+                        <h2 className="text-base font-black text-slate-800 mb-5">الحجوزات الأخيرة</h2>
                         <div className="space-y-3">
                             {recentBookings.map(booking => (
-                                <div key={booking.id} className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition">
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <p className="font-semibold text-gray-800 text-sm">{booking.student}</p>
-                                            <p className="text-xs text-gray-600 mt-1">{booking.session}</p>
-                                            <p className="text-xs text-gray-500 mt-1">{booking.date}</p>
+                                <div key={booking.id}
+                                     className="border border-slate-100 rounded-xl p-3 hover:bg-slate-50 transition">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="min-w-0">
+                                            <p className="font-bold text-slate-800 text-sm truncate">{booking.student}</p>
+                                            <p className="text-xs text-slate-500 mt-0.5 truncate">{booking.session}</p>
+                                            <p className="text-[11px] text-slate-400 mt-0.5">{booking.date}</p>
                                         </div>
-                                        <span className={`px-2 py-1 rounded text-xs ${booking.status === 'Confirmed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                            {booking.status === 'Confirmed' ? 'مؤكد' : 'معلق'}
+                                        <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full flex-shrink-0
+                                            ${booking.status === "Confirmed"
+                                                ? "bg-orange-50 text-orange-700 border border-orange-200"
+                                                : "bg-amber-50  text-amber-700  border border-amber-200"}`}>
+                                            {booking.status === "Confirmed" ? "مؤكد" : "معلق"}
                                         </span>
                                     </div>
                                 </div>
@@ -221,6 +213,7 @@ export default function TeacherDashboard() {
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     );

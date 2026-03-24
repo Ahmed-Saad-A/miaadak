@@ -13,16 +13,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import React from "react";
 import { signOut } from "next-auth/react";
-import user from '@/assets/male.png';
+import userImg from "@/assets/male.png";
 import Image from "next/image";
 
 interface UserDropdownProps {
     isAuthenticated: boolean;
-    userEmail: string | null;
-    userRole: string | null;
-    onLogout: () => void;
-    isMobile?: boolean;
-    unreadCount?: number; // عدد الإشعارات غير المقروءة
+    userEmail:       string | null;
+    userRole:        string | null;
+    onLogout:        () => void;
+    isMobile?:       boolean;
+    unreadCount?:    number;
 }
 
 export function UserDropdown({
@@ -30,19 +30,30 @@ export function UserDropdown({
     userEmail,
     userRole,
     onLogout,
-    isMobile = false,
+    isMobile    = false,
     unreadCount = 0,
 }: UserDropdownProps) {
     const pathname = usePathname();
+
+    const ROLE_AR: Record<string, string> = {
+        admin:     "مدير",
+        teacher:   "معلم",
+        student:   "طالب",
+        parent:    "ولي أمر",
+        assistant: "مساعد",
+    };
+
+    const roleAr = userRole ? (ROLE_AR[userRole.toLowerCase()] ?? userRole) : null;
 
     const handleLogout = async () => {
         await signOut({ callbackUrl: "/" });
         onLogout?.();
     };
 
+    // ── غير مسجّل ──────────────────────────────────────────────────────────
     if (!isAuthenticated) {
         return (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2" dir="rtl">
                 {pathname.startsWith("/auth/login") ? (
                     <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
                         <Link href="/auth/register">إنشاء حساب</Link>
@@ -53,15 +64,15 @@ export function UserDropdown({
                     </Button>
                 ) : (
                     <>
+                        <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
+                            <Link href="/auth/register">إنشاء حساب</Link>
+                        </Button>
                         <Button
                             variant="outline"
                             asChild
-                            className="border-orange-500 ms-4 text-orange-500 hover:bg-orange-500 hover:text-white"
+                            className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
                         >
                             <Link href="/auth/login">تسجيل الدخول</Link>
-                        </Button>
-                        <Button asChild className="bg-orange-500 hover:bg-orange-600 text-white">
-                            <Link href="/auth/register">إنشاء حساب</Link>
                         </Button>
                     </>
                 )}
@@ -69,19 +80,20 @@ export function UserDropdown({
         );
     }
 
+    // ── موبايل ────────────────────────────────────────────────────────────
     if (isMobile) {
         return (
-            <div className="w-full">
-                <div className="flex items-center gap-2 p-2 mb-2">
+            <div className="w-full" dir="rtl">
+                <div className="flex items-center gap-3 p-2 mb-2">
                     <Avatar>
-                        <Image src={user} alt={userEmail || "User"} />
+                        <Image src={userImg} alt={userEmail ?? "User"} />
                         <AvatarFallback className="bg-orange-100 text-orange-600">
                             <User className="h-5 w-5" />
                         </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col text-right">
                         <p className="font-medium text-sm">{userEmail}</p>
-                        <p className="text-xs text-gray-500">{userRole}</p>
+                        <p className="text-xs text-gray-500">{roleAr}</p>
                     </div>
                 </div>
                 <div className="flex gap-2">
@@ -104,9 +116,11 @@ export function UserDropdown({
         );
     }
 
+    // ── ديسكتوب ───────────────────────────────────────────────────────────
     return (
-        <div className="flex items-center gap-1">
-            {/* ✅ أيقونة الإشعارات */}
+        <div className="flex items-center gap-1" dir="rtl">
+
+            {/* أيقونة الإشعارات */}
             <Link href="/notifications">
                 <Button
                     variant="ghost"
@@ -114,9 +128,9 @@ export function UserDropdown({
                     aria-label="الإشعارات"
                 >
                     <Bell size={20} />
-                    {/* Badge عدد الإشعارات */}
                     {unreadCount > 0 && (
-                        <span className="absolute top-1 right-1 h-4 w-4 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center leading-none">
+                        <span className="absolute top-1 right-1 h-4 w-4 rounded-full bg-red-500
+                                         text-[10px] font-bold text-white flex items-center justify-center leading-none">
                             {unreadCount > 9 ? "9+" : unreadCount}
                         </span>
                     )}
@@ -128,7 +142,7 @@ export function UserDropdown({
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                         <Avatar className="h-10 w-10">
-                            <Image src={user} alt={userEmail || "User"} />
+                            <Image src={userImg} alt={userEmail ?? "User"} />
                             <AvatarFallback className="bg-orange-100 text-orange-600">
                                 <User className="h-5 w-5" />
                             </AvatarFallback>
@@ -137,48 +151,55 @@ export function UserDropdown({
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent
-                    className="w-fit mt-2 rounded-xl border border-gray-100 bg-white shadow-lg p-2"
-                    align="start"
+                    className="w-52 rounded-xl border border-gray-100 bg-white shadow-lg p-2"
+                    align="end"
+                    sideOffset={8}
                 >
+                    <div dir="rtl">
+                    {/* معلومات المستخدم */}
                     <div className="flex items-center gap-3 p-2 border-b border-gray-100 mb-2">
                         <Avatar className="h-8 w-8">
                             <AvatarFallback className="bg-orange-100 text-orange-600">
                                 <User className="h-4 w-4" />
                             </AvatarFallback>
                         </Avatar>
-                        <div>
-                            <p className="text-sm font-medium">{userEmail}</p>
-                            <p className="text-xs text-gray-500">{userRole}</p>
+                        <div className="text-right min-w-0">
+                            <p className="text-sm font-semibold truncate" dir="ltr">{userEmail}</p>
+                            <p className="text-xs text-gray-500">{roleAr}</p>
                         </div>
                     </div>
 
+                    {/* الملف الشخصي */}
                     <DropdownMenuItem asChild>
-                        <Link href="/settings" className="flex items-center gap-2">
-                            الملف الشخصي
-                            <UserCircle className="h-4 w-4 text-orange-500" />
+                        <Link href="/settings" className="flex items-center gap-2 w-full">
+                            <UserCircle className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                            <span className="flex-1">الملف الشخصي</span>
                         </Link>
                     </DropdownMenuItem>
 
-                    {/* ✅ Notifications في الـ Dropdown كـ shortcut ثاني */}
+                    {/* الإشعارات */}
                     <DropdownMenuItem asChild>
-                        <Link href="/notifications" className="flex items-center gap-2">
-                            <span>الإشعارات</span>
-                            <Bell className="h-4 w-4 text-orange-500" />
+                        <Link href="/notifications" className="flex items-center gap-2 w-full">
+                            <Bell className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                            <span className="flex-1">الإشعارات</span>
                             {unreadCount > 0 && (
-                                <span className="mr-auto h-5 w-5 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center">
+                                <span className="h-5 w-5 rounded-full bg-red-500 text-[10px]
+                                                 font-bold text-white flex items-center justify-center flex-shrink-0">
                                     {unreadCount > 9 ? "9+" : unreadCount}
                                 </span>
                             )}
                         </Link>
                     </DropdownMenuItem>
 
+                    {/* تسجيل الخروج */}
                     <DropdownMenuItem
                         onClick={handleLogout}
-                        className="flex items-center gap-2 text-red-600 focus:bg-red-50"
+                        className="flex items-center gap-2 text-red-600 focus:bg-red-50 w-full"
                     >
-                        <LogOut className="h-4 w-4" />
-                        تسجيل الخروج
+                        <LogOut className="h-4 w-4 flex-shrink-0" />
+                        <span className="flex-1">تسجيل الخروج</span>
                     </DropdownMenuItem>
+                    </div>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
