@@ -294,20 +294,20 @@ export default function Settings({ user }: SettingsProps) {
   };
 
   // ── Save profile ───────────────────────────────────────────────────────────
-  const handleSaveProfile = async () => {
-    setSavingProfile(true);
-    try {
-      await onSave?.({
-        firstName, lastName, phone,
-        ...(user.subject  !== undefined && { subject:   extra }),
-        ...(user.level    !== undefined && { level:     extra }),
-        ...(user.childName!== undefined && { childName: extra }),
-        ...(avatarSrc.startsWith("data:") && { avatarBase64: avatarSrc }),
-      });
-      showToast("تم حفظ البيانات بنجاح");
-    } catch { showToast("فشل الحفظ، حاول مرة أخرى", "err"); }
-    finally { setSavingProfile(false); }
-  };
+  // const handleSaveProfile = async () => {
+  //   setSavingProfile(true);
+  //   try {
+  //     await Save?.({
+  //       firstName, lastName, phone,
+  //       ...(user.subject  !== undefined && { subject:   extra }),
+  //       ...(user.level    !== undefined && { level:     extra }),
+  //       ...(user.childName!== undefined && { childName: extra }),
+  //       ...(avatarSrc.startsWith("data:") && { avatarBase64: avatarSrc }),
+  //     });
+  //     showToast("تم حفظ البيانات بنجاح");
+  //   } catch { showToast("فشل الحفظ، حاول مرة أخرى", "err"); }
+  //   finally { setSavingProfile(false); }
+  // };
 
   // ── Save password ──────────────────────────────────────────────────────────
   const handleSavePassword = async () => {
@@ -504,7 +504,8 @@ export default function Settings({ user }: SettingsProps) {
             </div>
           )}
 
-          <button onClick={handleSaveProfile} disabled={savingProfile}
+            {/* onClick={handleSaveProfile} */}
+          <button  disabled={savingProfile}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl
                        bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold
                        transition-all shadow-md shadow-amber-200 disabled:opacity-60">
