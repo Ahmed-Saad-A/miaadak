@@ -7,23 +7,26 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Image from "next/image";
-import { Assistant, TeacherAssistantProps } from "@/interfaces/assistant";
+import { Assistant } from "@/interfaces/assistant";
 import { AssistantForm } from "@/components";
 import { getMockAssistants } from "@/lib/mockAssistantsData";
+import { useSession } from "next-auth/react";
 
 
 
-const TeacherAssistant = ({ teacherId }: TeacherAssistantProps) => {
-  const [assistants, setAssistants] = useState<Assistant[]>([]);
+const TeacherAssistant = () => {
+  const { data: session } = useSession();
+  const teacherId = (session?.user as { id?: string })?.id ?? "";
+ 
+  const [assistants,         setAssistants]         = useState<Assistant[]>([]);
   const [filteredAssistants, setFilteredAssistants] = useState<Assistant[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "locked">("all");
-
-  // Fetch Assistants
+  const [isLoading,          setIsLoading]          = useState(false);
+  const [showForm,           setShowForm]           = useState(false);
+  const [searchQuery,        setSearchQuery]        = useState("");
+  const [filterStatus,       setFilterStatus]       = useState<"all" | "active" | "locked">("all");
+ 
   useEffect(() => {
-    fetchAssistants();
+    if (teacherId) fetchAssistants();
   }, [teacherId]);
 
   // Filter Assistants
