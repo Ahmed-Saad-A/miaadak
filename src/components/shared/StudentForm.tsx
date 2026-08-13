@@ -545,6 +545,7 @@ const StudentForm = () => {
 
         <div className="flex justify-between mt-8">
           <motion.button
+            type="button"
             onClick={prevStep}
             className="px-6 py-3 rounded-full font-medium transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300"
             whileHover={{ scale: 1.05 }}
@@ -554,6 +555,7 @@ const StudentForm = () => {
           </motion.button>
 
           <motion.button
+            type="button"
             onClick={currentStep === 5 ? handleSubmit : nextStep}
             disabled={isLoading}
             className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${isLoading

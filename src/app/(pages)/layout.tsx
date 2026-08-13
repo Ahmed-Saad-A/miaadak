@@ -34,10 +34,18 @@ export default function PagesLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Mobile & Tablet Layout */}
-            <div className="lg:hidden flex flex-col flex-1 pt-16">
+                {/* Main content - Full width on mobile */}
+            {/* <div className="lg:hidden flex flex-col flex-1 pt-16">
                 <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-                {/* Main content - Full width on mobile */}
+                <main className="bg-white flex-1 m-2 rounded-2xl">
+                    {children}
+                </main>
+            </div> */}
+            {/* Mobile & Tablet Layout */}
+            <div className="lg:hidden flex flex-col flex-1">
+                <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+                <Navbar />
                 <main className="bg-white flex-1 m-2 rounded-2xl">
                     {children}
                 </main>

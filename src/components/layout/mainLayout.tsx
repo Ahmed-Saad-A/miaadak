@@ -10,6 +10,19 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     const user = session?.user;
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+    // Guest Layout - مفيهوش sidebar خالص
+    if (!user) {
+        return (
+            <div className="min-h-screen flex flex-col bg-[#f4f4f4]">
+                <Navbar />
+                <main className="flex-1 bg-white rounded-2xl mx-4 my-2">
+                    {children}
+                </main>
+            </div>
+        );
+    }
+
+    // Authenticated Layout - الكود الأصلي بتاعك
     return (
         <div className="min-h-screen flex flex-col bg-[#f4f4f4]">
             <div className={`flex flex-1 flex-row-reverse relative transition-all duration-300 ${isSidebarOpen ? "mr-[15rem]" : "mr-20"}`}>
