@@ -1,5 +1,5 @@
 
-import Settings from "@/components/system/settings";
+import Settings from "@/components/system/Profile";
 
 export default function Page() {
   return (
