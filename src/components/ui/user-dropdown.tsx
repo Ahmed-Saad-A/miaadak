@@ -18,11 +18,11 @@ import Image from "next/image";
 
 interface UserDropdownProps {
     isAuthenticated: boolean;
-    userEmail:       string | null;
-    userRole:        string | null;
-    onLogout:        () => void;
-    isMobile?:       boolean;
-    unreadCount?:    number;
+    userEmail: string | null;
+    userRole: string | null;
+    onLogout: () => void;
+    isMobile?: boolean;
+    unreadCount?: number;
 }
 
 export function UserDropdown({
@@ -30,16 +30,20 @@ export function UserDropdown({
     userEmail,
     userRole,
     onLogout,
-    isMobile    = false,
+    isMobile = false,
     unreadCount = 0,
 }: UserDropdownProps) {
     const pathname = usePathname();
+    const getBasePath = () => {
+        const segments = pathname.split("/").filter(Boolean);
+        return segments.length > 0 ? `/${segments[0]}` : "";
+    };
 
     const ROLE_AR: Record<string, string> = {
-        admin:     "مدير",
-        teacher:   "معلم",
-        student:   "طالب",
-        parent:    "ولي أمر",
+        admin: "مدير",
+        teacher: "معلم",
+        student: "طالب",
+        parent: "ولي أمر",
         assistant: "مساعد",
     };
 
@@ -102,7 +106,7 @@ export function UserDropdown({
                         variant="outline"
                         className="flex-1 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
                     >
-                        <Link href="/profile">الملف الشخصي</Link>
+                        <Link href={`${getBasePath()}/profile`}>الملف الشخصي</Link>
                     </Button>
                     <Button
                         variant="outline"
@@ -121,7 +125,7 @@ export function UserDropdown({
         <div className="flex items-center gap-1" dir="rtl">
 
             {/* أيقونة الإشعارات */}
-            <Link href="/notifications">
+            <Link href={`${getBasePath()}/notifications`}>
                 <Button
                     variant="ghost"
                     className="relative h-10 w-10 rounded-full hover:bg-white/20 text-white"
@@ -156,49 +160,49 @@ export function UserDropdown({
                     sideOffset={8}
                 >
                     <div dir="rtl">
-                    {/* معلومات المستخدم */}
-                    <div className="flex items-center gap-3 p-2 border-b border-gray-100 mb-2">
-                        <Avatar className="h-8 w-8">
-                            <AvatarFallback className="bg-orange-100 text-orange-600">
-                                <User className="h-4 w-4" />
-                            </AvatarFallback>
-                        </Avatar>
-                        <div className="text-right min-w-0">
-                            <p className="text-sm font-semibold truncate" dir="ltr">{userEmail}</p>
-                            <p className="text-xs text-gray-500">{roleAr}</p>
+                        {/* معلومات المستخدم */}
+                        <div className="flex items-center gap-3 p-2 border-b border-orange-100 mb-2">
+                            <Avatar className="h-8 w-8">
+                                <AvatarFallback className="bg-orange-100 text-orange-600">
+                                    <User className="h-4 w-4" />
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="text-right min-w-0">
+                                <p className="text-sm font-semibold truncate" dir="ltr">{userEmail}</p>
+                                <p className="text-xs text-gray-500">{roleAr}</p>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* الملف الشخصي */}
-                    <DropdownMenuItem asChild>
-                        <Link href="/settings" className="flex items-center gap-2 w-full">
-                            <UserCircle className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                            <span className="flex-1">الملف الشخصي</span>
-                        </Link>
-                    </DropdownMenuItem>
+                        {/* الملف الشخصي */}
+                        <DropdownMenuItem asChild>
+                            <Link href={`${getBasePath()}/profile`} className="flex items-center gap-2 w-full">
+                                <UserCircle className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                                <span className="flex-1">الملف الشخصي</span>
+                            </Link>
+                        </DropdownMenuItem>
 
-                    {/* الإشعارات */}
-                    <DropdownMenuItem asChild>
-                        <Link href="/notifications" className="flex items-center gap-2 w-full">
-                            <Bell className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                            <span className="flex-1">الإشعارات</span>
-                            {unreadCount > 0 && (
-                                <span className="h-5 w-5 rounded-full bg-red-500 text-[10px]
+                        {/* الإشعارات */}
+                        <DropdownMenuItem asChild>
+                            <Link href={`${getBasePath()}/notifications`} className="flex items-center gap-2 w-full">
+                                <Bell className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                                <span className="flex-1">الإشعارات</span>
+                                {unreadCount > 0 && (
+                                    <span className="h-5 w-5 rounded-full bg-red-500 text-[10px]
                                                  font-bold text-white flex items-center justify-center flex-shrink-0">
-                                    {unreadCount > 9 ? "9+" : unreadCount}
-                                </span>
-                            )}
-                        </Link>
-                    </DropdownMenuItem>
+                                        {unreadCount > 9 ? "9+" : unreadCount}
+                                    </span>
+                                )}
+                            </Link>
+                        </DropdownMenuItem>
 
-                    {/* تسجيل الخروج */}
-                    <DropdownMenuItem
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 text-red-600 focus:bg-red-50 w-full"
-                    >
-                        <LogOut className="h-4 w-4 flex-shrink-0" />
-                        <span className="flex-1">تسجيل الخروج</span>
-                    </DropdownMenuItem>
+                        {/* تسجيل الخروج */}
+                        <DropdownMenuItem
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 text-red-600 focus:bg-red-50 w-full"
+                        >
+                            <LogOut className="h-4 w-4 flex-shrink-0" />
+                            <span className="flex-1">تسجيل الخروج</span>
+                        </DropdownMenuItem>
                     </div>
                 </DropdownMenuContent>
             </DropdownMenu>

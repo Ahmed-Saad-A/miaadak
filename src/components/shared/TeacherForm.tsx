@@ -499,20 +499,25 @@ const TeacherForm = () => {
             onChange={(e) =>
               handleInputChange(
                 "experienceYears",
-                e.target.value === "" ? "" : Number(e.target.value)
-              )
-            }
-            onBlur={(e) =>
-              validateField(
-                "experienceYears",
                 Number(e.target.value || 0)
               )
+            //   onChange={(e) =>
+            //   handleInputChange(
+            //     "experienceYears",
+            //     e.target.value === "" ? "" : Number(e.target.value)
+            //   )
             }
-            className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("experienceYears")
-                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
-                : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
-              }`}
-            placeholder="أدخل سنوات الخبرة"
+          onBlur={(e) =>
+            validateField(
+              "experienceYears",
+              Number(e.target.value || 0)
+            )
+          }
+          className={`w-full px-4 py-3 outline-0 rounded-xl border transition-all duration-200 ${getFieldError("experienceYears")
+            ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+            : "border-gray-300 focus:border-[#ff751f] focus:ring-2 focus:ring-[#ff751f]/20"
+            }`}
+          placeholder="أدخل سنوات الخبرة"
           />
 
           {getFieldError("experienceYears") && (
@@ -548,6 +553,7 @@ const TeacherForm = () => {
 
         <div className="flex justify-between mt-8">
           <motion.button
+            type="button"
             onClick={prevStep}
             className="px-6 py-3 rounded-full font-medium transition-all duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300"
             whileHover={{ scale: 1.05 }}
@@ -557,6 +563,7 @@ const TeacherForm = () => {
           </motion.button>
 
           <motion.button
+            type="button"
             onClick={currentStep === 5 ? handleSubmit : nextStep}
             disabled={isLoading}
             className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${isLoading
