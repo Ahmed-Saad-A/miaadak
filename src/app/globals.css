@@ -1,10 +1,53 @@
+
 @import "tailwindcss";
-@import "tw-animate-css";
 
-/* @custom-variant dark (&:is(.dark *)); */
+@import "ag-grid-community/styles/ag-grid.css";
+@import "ag-grid-community/styles/ag-theme-quartz.css";
 
-/* @layer base {
-    body {
-        @apply bg-white;
-    }
+html[dir="rtl"] .ag-root-wrapper,
+html[dir="rtl"] .ag-root {
+  direction: rtl;
+}
+
+.ag-theme-quartz {
+  --ag-font-family: "Tajawal", sans-serif;
+  --ag-border-color: #e5e7eb;
+  --ag-header-background-color: #f9fafb;
+  --ag-header-foreground-color: #111827;
+  --ag-row-hover-color: #e1effe;
+  --ag-row-border-color: #f3f4f6;
+}
+
+
+/* :root {
+
 } */
+
+@layer base {
+  * {
+    @apply scroll-smooth;
+    box-sizing: border-box;
+  }
+
+  html {
+    direction: rtl;
+  }
+
+  body {
+    @apply bg-[#f4f4f4] text-gray-950;
+  }
+
+    button {
+    @apply cursor-pointer;
+  }
+
+  input, textarea {
+    @apply text-right placeholder:text-right;
+  }
+}
+
+@layer utilities {
+  .container {
+    @apply mx-auto max-w-11/12 px-4 sm:px-6 lg:px-8;
+  }
+}

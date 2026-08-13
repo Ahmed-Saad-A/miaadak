@@ -1,43 +1,25 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Navbar } from "@/components/layout";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { AuthProvider } from "@/components/providers/auth-provider";
+import { MainLayout } from "@/components/layout";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Miaadak - Appointment Booking",
   description: "Book appointments easily with our modern booking platform",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange={false}
-        >
-          <Navbar />
-          {children}
-        </ThemeProvider>
+    <html lang="ar" suppressHydrationWarning>
+      <body>
+        <AuthProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <MainLayout>{children}</MainLayout>
+            <Toaster position="top-center" />
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );
